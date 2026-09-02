@@ -1,7 +1,7 @@
 /* Service worker do BUSCADOR DE BANCOS V5 — gerado por publicar_pages.py.
    Cache versionado pelo build: publicar build novo troca este arquivo inteiro. */
 'use strict';
-const CACHE = 'buscador-v5-104dc18c';
+const CACHE = 'buscador-v5-d3b233ab';
 const CACHE_FONTES = 'buscador-fontes-v1';
 /* index UMA vez so no PRECACHE ('./' fora): com './' e './index.html' o addAll
    baixava e guardava os 37 MB em DOBRO (medido 01/09/2026); toda navegacao e
