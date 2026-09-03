@@ -1,7 +1,7 @@
 /* Service worker do BUSCADOR DE BANCOS V5 — gerado por publicar_pages.py.
    Cache versionado pelo build: publicar build novo troca este arquivo inteiro. */
 'use strict';
-const CACHE = 'buscador-v5-d211c2d8';
+const CACHE = 'buscador-v5-81af0c0d';
 const CACHE_FONTES = 'buscador-fontes-v1';
 /* index UMA vez so no PRECACHE ('./' fora): com './' e './index.html' o addAll
    baixava e guardava os 37 MB em DOBRO (medido 01/09/2026); toda navegacao e
@@ -35,8 +35,20 @@ self.addEventListener('fetch', function (e) {
     }));
     return;
   }
-  // mesmo origin: cache-first; NAVEGACAO sempre sai do index cacheado
+  // mesmo origin: cache-first; navegacao DA APP sai do index cacheado
   if (url.origin === location.origin) {
+    /* ACHADO 03/09/2026 — `mode === 'navigate'` NAO e' so' a rota da app: o
+       CLIQUE num link de documento (o caderno em PDF, a planilha da fonte)
+       tambem e' navegacao. Com a regra antiga, clicar em ABRIR NA P.N devolvia
+       o `index.html` cacheado em vez do arquivo — o usuario clicava e o
+       documento nunca abria. Medido no site em 03/09; a verificacao anterior
+       passou porque usava `fetch(HEAD)`, que NAO e' navegacao: provou que o
+       arquivo existe, nao que o clique abre.
+       Regra: navegacao para CAMINHO COM EXTENSAO (que nao seja .htm/.html) vai
+       para a rede, sem interceptacao. */
+    var ehArquivo = /\.[a-z0-9]{2,5}$/i.test(url.pathname) &&
+                    !/\.html?$/i.test(url.pathname);
+    if (e.request.mode === 'navigate' && ehArquivo) { return; }
     e.respondWith(caches.open(CACHE).then(function (c) {
       const alvo = (e.request.mode === 'navigate') ? './index.html' : e.request;
       return c.match(alvo, { ignoreSearch: true }).then(function (hit) {
