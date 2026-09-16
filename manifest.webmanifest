@@ -1,13 +1,13 @@
 {
-  "name": "BUSCADOR DE BANCOS",
-  "short_name": "BUSCADOR",
+  "name": "Códice — Buscador de Bancos",
+  "short_name": "Códice",
   "description": "Busca de codigos, criterios e precos SINAPI / SICRO / SICOR / SUDECAP",
   "lang": "pt-BR",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#eef1f0",
-  "theme_color": "#0f5c7a",
+  "background_color": "#f1f4f8",
+  "theme_color": "#0b2a4a",
   "icons": [
     {
       "src": "icone-192.png",
