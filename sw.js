@@ -49,6 +49,14 @@ self.addEventListener('fetch', function (e) {
     var ehArquivo = /\.[a-z0-9]{2,5}$/i.test(url.pathname) &&
                     !/\.html?$/i.test(url.pathname);
     if (e.request.mode === 'navigate' && ehArquivo) { return; }
+    /* ACHADO 17/09/2026 — /app/ (pagina de instalacao do APK) e /vitrine/ sao PAGINAS PROPRIAS dentro do escopo:
+       a regra "toda navegacao sai do index cacheado" devolvia o buscador no lugar delas (medido: ele abriu /app/
+       no celular e caiu no site; reproduzido em Chromium com o SW ativo). Navegacao para SUBPASTA do escopo
+       vai para a rede, sem interceptacao; so a raiz do escopo e' a app. */
+    var raiz = new URL(self.registration.scope).pathname;
+    var ehSubpasta = url.pathname.length > raiz.length && url.pathname.indexOf(raiz) === 0 &&
+                     url.pathname.slice(raiz.length).indexOf('/') >= 0;
+    if (e.request.mode === 'navigate' && ehSubpasta) { return; }
     e.respondWith(caches.open(CACHE).then(function (c) {
       const alvo = (e.request.mode === 'navigate') ? './index.html' : e.request;
       return c.match(alvo, { ignoreSearch: true }).then(function (hit) {
