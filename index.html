@@ -5243,6 +5243,39 @@ function fechamentoCensoInterno(){
   .m-ficha-acoes button svg{width:20px;height:20px;stroke:currentColor;flex-shrink:0}
   .m-ficha-acoes button.cheio{flex:1.1;background:var(--laranja);border-color:var(--laranja);color:#fff;font-family:"Montserrat","Segoe UI",system-ui,sans-serif;font-weight:700}
 
+  /* COMPOSIÇÃO ANALÍTICA DENTRO DA FICHA (pedido dele 17/09 09:5x) e em CARTÕES (captura dele 09:52: com 8 colunas na
+     largura do celular a DESCRIÇÃO ficava com 1/8 da tela e cada item virava 10+ linhas). Mesma técnica da lista: a
+     tabela vira bloco, cada linha um cartão — 1ª linha natureza · código · parcial; 2ª descrição inteira; 3ª un ·
+     coeficiente × preço; 4ª barra de participação. Vale na ficha e no modal (mesma fichaComposicaoHTML). */
+  .m-comp{padding:0!important;scroll-margin-top:72px}
+  .m-comp .m-comp-cab{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;min-height:48px;margin:0;font-size:12px}
+  .m-comp .m-comp-seta{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid currentColor;transition:transform .15s}
+  .m-comp.fechada .m-comp-seta{transform:rotate(-90deg)}
+  .m-comp .m-comp-n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--azulb);font-weight:600}
+  .m-comp .m-comp-corpo{border-top:1px solid var(--fioc)}
+  .fcomp{display:block;width:100%;border:none}
+  .fcomp tbody{display:block}
+  .fcomp tr{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:3px;padding:10px 16px;border-bottom:1px solid var(--fioc);background:#fff}
+  .fcomp tr:first-child{display:none}
+  .fcomp td{display:block;padding:0;border:none;white-space:normal;text-align:left;font-size:14px;background:transparent}
+  .fcomp td:nth-child(1){order:1}
+  .fcomp td:nth-child(2){order:2}
+  .fcomp td:nth-child(7){order:3;margin-left:auto;font-size:15px;font-weight:700}
+  .fcomp td:nth-child(3){order:4;flex:1 1 100%;line-height:1.35;color:var(--texto)}
+  .fcomp td:nth-child(4){order:5;font-size:13px;color:var(--apagado)}
+  .fcomp td:nth-child(4)::after{content:" ·"}
+  .fcomp td:nth-child(5){order:6;font-size:13px;color:var(--apagado)}
+  .fcomp td:nth-child(6){order:7;font-size:13px;color:var(--texto)}
+  .fcomp td:nth-child(6)::before{content:"× ";color:var(--apagado)}
+  .fcomp td:nth-child(8){order:8;flex:1 1 100%;display:flex;align-items:center;gap:8px;margin-top:2px}
+  .fcomp td:nth-child(8) .pbar{height:4px;flex:0 1 auto}
+  .fcomp td:nth-child(8) .ppct{font-size:12px;color:var(--apagado);white-space:nowrap}
+  .fcomp .selo-cala{display:block;margin-top:4px;white-space:normal}
+  .fcomp-mem{padding:10px 16px!important;font-size:13px!important}
+  .fcomp-total{padding:13px 16px}
+  .fcomp-total .prova{font-size:12px}
+  .fcomp-pe{padding:10px 16px;display:flex;flex-direction:column;gap:4px}
+
   /* modais (ficha completa, comparar, acervo, Excel) em tela cheia */
   .tela-cheia{padding:0;z-index:75}
   .modal{max-width:none;max-height:none;height:100%;border-radius:0}
@@ -5345,7 +5378,7 @@ function fechamentoCensoInterno(){
   var _renderFichaLateral=renderFichaLateral;
   renderFichaLateral=function(){
     var r=_renderFichaLateral.apply(this,arguments);
-    if(S.fichaAberta){ rotaAbrir("ficha"); urlDaFicha(); fichaAcoes(); }
+    if(S.fichaAberta){ rotaAbrir("ficha"); urlDaFicha(); fichaAcoes(); fichaComposicao(); }
     else { rotaFechar("ficha"); urlLimpa(); }
     navAtivo();
     return r;
@@ -5552,7 +5585,7 @@ function fechamentoCensoInterno(){
       var q=b.getAttribute("data-m-mais");
       if(q==="comparar"){ maisFechar(); var x=$("btn-comparar"); if(x) x.click(); }
       else if(q==="excel"){ maisFechar(); var y=$("btn-excel"); if(y) y.click(); }
-      else if(q==="analitica"){ maisFechar(); if(ba&&!ba.hidden&&S.fichaAberta) ba.click(); else toast("Toque num código da lista: a composição analítica fica na barra da ficha"); }
+      else if(q==="analitica"){ maisFechar(); if(S.fichaAberta) composicaoMostrar(); else toast("Toque num código da lista: a composição analítica abre dentro da ficha"); }
       else if(q==="copiar"){ maisFechar(); copiarLink(); }
       else if(q==="instalar"){ maisFechar(); if(M.instalar){ M.instalar.prompt(); M.instalar.userChoice.then(function(){ M.instalar=null; }); } }
       else if(q==="bases"){ copiar(bases); }
@@ -5579,13 +5612,48 @@ function fechamentoCensoInterno(){
       var q=b.getAttribute("data-m-ficha");
       if(q==="share") compartilhar();
       else if(q==="completa"&&typeof abrirFicha==="function") abrirFicha(S.fichaAberta);
-      else if(q==="analitica"){ var ba=$("btn-analitica"); if(ba) ba.click(); }
+      else if(q==="analitica"){ composicaoMostrar(); }
       else if(q==="comparar"&&typeof addComparar==="function"){ addComparar(S.fichaAberta); toast("Marcado para comparar"); navAtivo(); }
       ev.stopPropagation();
     });
     w.appendChild(bar);
   }
-  M.filtrosAbrir=filtrosAbrir; M.filtrosFechar=filtrosFechar; M.maisAbrir=maisAbrir; M.maisFechar=maisFechar;
+  // ---------- 4b. COMPOSIÇÃO ANALÍTICA DENTRO DA FICHA (pedido dele 17/09 09:5x: "abrir a composição analítica
+  // seja mais fácil, sem precisar clicar na ficha completa"). A seção usa a MESMA fichaComposicaoHTML do template
+  // (versão vigente do fechamento_composicao.js: itens, memória de cálculo, prova de fechamento) logo abaixo da
+  // descrição; recolhível, estado em localStorage codice.comp; o botão Composição da barra rola até ela. O id
+  // fcomp-total fica só no modal (portões do template leem por id) — aqui vira data-m-total. ----------
+  function fichaComposicao(){
+    if(!celular()) return;
+    var w=$("lista-ficha"); if(!w||!S.fichaAberta||w.querySelector("#m-comp")||typeof fichaComposicaoHTML!=="function") return;
+    var c=achaCode(S.fichaAberta); if(!c) return;
+    var tem=(typeof ANALITICA!=="undefined"&&ANALITICA);
+    var it=tem?ANALITICA[chaveDados(c)]:null, n=it?it.length:0;
+    var estado=n?(n+" ITENS"):(tem?((c[F.NAT]&&c[F.NAT]!=="COMPOSICAO")?"INSUMO — SEM DECOMPOSIÇÃO":"SEM ANALÍTICA NESTA REFERÊNCIA"):"CARREGANDO");
+    var aberta=true; try{ aberta=localStorage.getItem("codice.comp")!=="fechada"; }catch(_e){}
+    var sec=document.createElement("div"); sec.className="fic-sec m-comp"+(aberta?"":" fechada"); sec.id="m-comp";
+    var corpo; try{ corpo=fichaComposicaoHTML(c).replace('id="fcomp-total"','data-m-total="1"'); }
+    catch(e){ corpo='<div class="mono" style="font-size:12px;color:var(--faint)">COMPOSIÇÃO INDISPONÍVEL: '+esc_(String(e&&e.message||e))+'</div>'; }
+    sec.innerHTML='<div class="fic-st m-comp-cab" data-m-comp-tog><span class="m-comp-seta"></span>COMPOSIÇÃO ANALÍTICA<span class="m-comp-n">'+esc_(estado)+'</span></div>'+
+                  '<div class="m-comp-corpo"'+(aberta?'':' hidden')+'>'+corpo+'</div>';
+    sec.querySelector("[data-m-comp-tog]").addEventListener("click",function(ev){
+      ev.stopPropagation();
+      var cp=sec.querySelector(".m-comp-corpo"); cp.hidden=!cp.hidden; sec.classList.toggle("fechada",cp.hidden);
+      try{ localStorage.setItem("codice.comp",cp.hidden?"fechada":"aberta"); }catch(_e){}
+    });
+    var fic=w.querySelector(".fic"); if(!fic) return;
+    var desc=fic.querySelector('.fic-sec > div[style*="font-weight:600"]');
+    var ancora=desc&&desc.parentNode&&desc.parentNode.parentNode===fic?desc.parentNode:null;
+    if(ancora) fic.insertBefore(sec,ancora.nextSibling); else fic.appendChild(sec);
+  }
+  function composicaoMostrar(){
+    var sec=$("m-comp"); if(!sec){ fichaComposicao(); sec=$("m-comp"); }
+    if(!sec){ toast("Abra um código para ver a composição"); return; }
+    var cp=sec.querySelector(".m-comp-corpo");
+    if(cp&&cp.hidden){ cp.hidden=false; sec.classList.remove("fechada"); try{ localStorage.setItem("codice.comp","aberta"); }catch(_e){} }
+    try{ sec.scrollIntoView({behavior:"smooth",block:"start"}); }catch(_e){ sec.scrollIntoView(); }
+  }
+  M.filtrosAbrir=filtrosAbrir; M.filtrosFechar=filtrosFechar; M.maisAbrir=maisAbrir; M.maisFechar=maisFechar; M.composicaoMostrar=composicaoMostrar;
 
   // ---------- 5. faixa de bancos/data-bases RETRÁTIL (pedido dele, 17/09/2026 00:0x: "a lista de bancos
   // selecionados ocupa muito espaço da tela") — vale em qualquer largura. Recolhida por padrão: uma linha
