@@ -350,8 +350,23 @@
   #vs-moldura{flex:1;height:100%;display:flex;align-items:center;justify-content:center;
               overflow:hidden;cursor:grab;min-width:0}
   #vs-moldura.arrastando{cursor:grabbing}
-  #vs-img{display:block;background:#fff;transform-origin:center center;
-          will-change:transform;user-select:none;-webkit-user-drag:none}
+  #vs-img{display:block;background:#fff;user-select:none;-webkit-user-drag:none}
+  /* O transform saiu da <img> e subiu para o quadro: assim o pino da RA
+     viaja junto com zoom, arrasto e giro sem recalcular nada. */
+  #vs-quadro{position:relative;flex-shrink:0;transform-origin:center center;
+          will-change:transform}
+  #vs-ar-pino{position:absolute;display:none;box-sizing:border-box;
+          border:2px solid #23d18b;border-radius:4px;background:transparent;
+          box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 0 6px rgba(35,209,139,.28);
+          cursor:pointer;animation:ra-pulsa 2.2s ease-in-out infinite}
+  #vs-ar-pino:focus-visible{outline:3px solid #fff;outline-offset:2px}
+  @keyframes ra-pulsa{0%,100%{box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 0 6px rgba(35,209,139,.28)}
+          50%{box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 0 11px rgba(35,209,139,0)}}
+  @media (prefers-reduced-motion:reduce){#vs-ar-pino{animation:none}}
+  #vs-ar{display:none;align-items:center;gap:6px;background:#0f6b45;color:#fff;
+          border:1px solid #23d18b;font:inherit;font-size:12px;letter-spacing:.04em;
+          padding:7px 12px;cursor:pointer;text-decoration:none;min-height:38px}
+  #vs-ar:hover{background:#14895a}
   #vs-tira{display:flex;align-items:center;justify-content:center;gap:8px;
            padding:9px 0 7px;flex-shrink:0;flex-wrap:wrap}
   .vs-mini{border:1px solid rgba(255,255,255,.28);background:#fff;padding:2px;
@@ -956,7 +971,7 @@
   </div>
   <div id="vs-palco">
     <button type="button" class="vs-seta" id="vs-ant" title="Prancha anterior">&#8249;</button>
-    <div id="vs-moldura"><img id="vs-img" alt=""></div>
+    <div id="vs-moldura"><div id="vs-quadro"><img id="vs-img" alt=""><a id="vs-ar-pino" target="_blank" rel="noopener noreferrer"></a></div></div>
     <button type="button" class="vs-seta" id="vs-prox" title="Pr&oacute;xima prancha">&#8250;</button>
   </div>
   <div id="vs-tira"></div>
@@ -964,6 +979,8 @@
     <div class="vs-leg" id="vs-leg"></div>
     <div class="vs-fonte mono" id="vs-fonte"></div>
     <div class="vs-abrir" id="vs-abrir"></div>
+    <a id="vs-ar" target="_blank" rel="noopener noreferrer"
+       title="Abre o modelo 3D do dispositivo no 3D Warehouse (precisa de internet)">&#9673; VER EM 3D / RA</a>
     <button type="button" id="vs-pdf" title="Gerar PDF desta prancha e escolher onde salvar">SALVAR PDF</button>
   </div>
   <div id="vs-dica" class="mono">RODA AMPLIA NO CURSOR &middot; ARRASTAR MOVE &middot; &larr; &rarr; TROCA DE PRANCHA &middot; DUPLO-CLIQUE VOLTA &middot; ESC FECHA</div>
@@ -3592,6 +3609,10 @@ function fichaPranchaDossieHTML(c){
   }
   h+=seloPranchaHTML(p0);
   if(p0.leg) h+='<div class="fic-pag" data-prancha-legenda="1">'+esc(p0.leg.toUpperCase())+'</div>';
+  var ra0=ra3dDa(p0);
+  if(ra0) h+='<div class="fic-pag"><a href="'+esc(ra0.url)+'" target="_blank" rel="noopener noreferrer" '+
+              'data-ra3d="1" style="color:#0f6b45;font-weight:600;text-decoration:none">'+
+              '&#9673; VER O DISPOSITIVO EM 3D / RA</a></div>';
   h+='<div class="fic-pag">'+esc(p0.rel.split("/").pop())+' · '+htmlLinkDoc(p0.pdfI,p0.pag)+'</div></div>';
   return h;
 }
@@ -4057,6 +4078,26 @@ function alertaTopo(txt){
 var DIR_PRANCHAS="_pranchas/";
 var VS={lista:[],i:0,z:1,rot:0,x:0,y:0,base:1,arrastando:false,px:0,py:0,voltarPara:null};
 
+// =====================================================================
+//  REALIDADE AUMENTADA DAS PRANCHAS (17/09/2026)
+//  As pranchas do Caderno de Drenagem do DER-MG trazem um QR impresso que
+//  aponta para o modelo 3D do dispositivo no 3D Warehouse. Ler esse QR com
+//  a camera de OUTRO aparelho, estando a prancha ja na tela deste, e pedir
+//  ao usuario que contorne a propria tela. Entao o destino do QR foi lido
+//  no PDF de origem (imagem embutida, decodificada no build) e viaja aqui
+//  como dado: chave = MESMA chave de PRANCHAS ("rel|pagina"), valor =
+//  [uuid do modelo, x, y, largura, altura] com a caixa do QR em FRACAO da
+//  pagina — serve para qualquer render, em qualquer resolucao.
+//  Sem internet o link nao abre: por isso ele se declara no title e nunca
+//  substitui o QR impresso, que continua na prancha para quem for a campo.
+// =====================================================================
+var RA3D_BASE="https://3dwarehouse.sketchup.com/ar-view/";
+var RA3D={"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|7":["401e47cc-ca87-4dbc-b5b3-896c2409239f",0.46055,0.27914,0.04524,0.06328],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|8":["dfc061df-5d43-437f-a840-b8d3861a829f",0.46207,0.29012,0.04534,0.06456],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|10":["307840f2-f1ff-4fd8-a3eb-b795a8d90963",0.45128,0.32447,0.04534,0.06299],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|11":["dfc061df-5d43-437f-a840-b8d3861a829f",0.4527,0.29382,0.04534,0.06456],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|12":["a84f42f2-ac56-4bad-ae8c-e3f5e15498d6",0.45008,0.26318,0.04534,0.06442],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|13":["d73a4264-ac6b-4e3f-8cd8-5d1a4933ccda",0.46096,0.30665,0.04534,0.06385],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|14":["9eb996e2-20aa-4665-8df3-21e023000572",0.46267,0.28214,0.04534,0.06385],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|24":["2fc1764d-9c87-4301-98c1-f95a6eb9a1dd",0.46186,0.2924,0.04524,0.06356],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|26":["a192c6f5-b4a8-46df-a155-fba9363b78c3",0.45914,0.29553,0.04534,0.06413],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|28":["a4de02c3-12a5-4c31-aca9-4146a84dcbfe",0.4797,0.29026,0.04534,0.06456],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|30":["cb75111b-917b-4ea6-95e5-d117cc611860",0.46489,0.27972,0.04534,0.06371],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|32":["53c5639f-5620-48ce-9a29-e2f99308f2e0",0.45209,0.29283,0.04564,0.06385],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|33":["4e5333eb-09db-4a16-8c20-dca683193aca",0.49733,0.32675,0.04534,0.06285],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|34":["7ce63985-ab43-4dd3-9e93-203b404f9fcb",0.46025,0.27145,0.04534,0.06385],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|35":["4ea75775-4a99-47ba-8bd4-87b00c350816",0.45078,0.2914,0.04534,0.06456],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|37":["919fef49-3ed0-4d77-8826-849ec34bcb21",0.46045,0.27159,0.04534,0.06314],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|38":["900012af-01be-455d-9eee-3a6ddb74cb7f",0.4537,0.27116,0.04534,0.06413],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|39":["13b410d1-3e41-4e0c-8e94-0521a03c40d1",0.45884,0.27843,0.04524,0.06371],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|41":["0403ded0-4591-463b-86c4-b746a491e25d",0.44111,0.31249,0.04534,0.06413],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|42":["63a38600-078f-4074-8650-ebdaa8756c83",0.45189,0.30466,0.04534,0.06442],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|43":["691ecd99-c525-4314-8922-dbdcbb130a29",0.45834,0.28584,0.04534,0.06356],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|46":["b049f46c-73a6-484f-9a57-dab9944fc73b",0.46368,0.2639,0.04534,0.06385],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|47":["6ee97e63-68e3-46e9-998e-d4529640de46",0.46257,0.27758,0.04534,0.06371],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|48":["4a2be42a-eca9-4ae2-b8a1-4f0498854a4e",0.45834,0.27173,0.04534,0.06413],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|49":["3d89bcec-bc79-42e3-a306-570339623508",0.4664,0.27701,0.04534,0.06328],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|50":["1d9058bd-dbc2-4370-9889-2c72308e110d",0.46096,0.28513,0.04534,0.06314],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|52":["cb71ddef-98af-4a2f-8e9d-72431c6b0ef4",0.46126,0.29254,0.04534,0.06442],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|55":["7f1714ce-801f-49f3-bdc5-1c092dc7569e",0.45673,0.28599,0.04534,0.06356],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|56":["6d0c07a0-8c45-4ed9-afff-a917be0eca07",0.47909,0.29126,0.04534,0.06371],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|57":["da4a4ece-a984-47a9-9a4b-20afa12bdcb8",0.45874,0.28428,0.04534,0.06314],"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_Caderno de Drenagem.pdf|59":["2948d187-b0d6-4e42-a353-b9725b305186",0.467,0.28428,0.04534,0.06257]};
+function ra3dDa(p){
+  var r=p&&RA3D[p.chave];
+  return r?{url:RA3D_BASE+r[0],x:r[1],y:r[2],w:r[3],h:r[4]}:null;
+}
+
 // Todas as pranchas DISTINTAS de um código, na ordem dos vínculos.
 function pranchasDoCodigo(c){
   var out=[],vistas={};
@@ -4112,7 +4153,7 @@ function seloPranchaHTML(p){
 }
 function vsEl(id){return document.getElementById(id);}
 function vsAplica(){
-  var img=vsEl("vs-img");
+  var img=vsEl("vs-quadro")||vsEl("vs-img");
   img.style.transform="translate("+VS.x+"px,"+VS.y+"px) scale("+VS.z+") rotate("+VS.rot+"deg)";
   vsEl("vs-nivel").textContent=Math.round(VS.z/VS.base*100)+"%";
 }
@@ -4125,6 +4166,10 @@ function vsEnquadra(){
   // a imagem entra em tamanho natural e o zoom é só transform: assim ampliar
   // usa o pixel real do arquivo, sem reamostrar a cada passo
   img.style.width=p.w+"px"; img.style.height=p.h+"px";
+  // o quadro acompanha a imagem em pixel natural: o pino da RA e posicionado
+  // em % dentro dele, entao zoom e giro saem de graca no mesmo transform
+  var quadro=vsEl("vs-quadro");
+  if(quadro){quadro.style.width=p.w+"px"; quadro.style.height=p.h+"px";}
   VS.base=Math.min(cw/lw,ch/lh);
   VS.z=VS.base; VS.x=0; VS.y=0;
   vsAplica();
@@ -4142,6 +4187,7 @@ function vsMostra(i){
     (p.est?(" "+seloPranchaHTML(p).replace(/^<div[^>]*>|<\/div>$/g,"")):"");
   vsEl("vs-fonte").textContent=p.rel.split("/").pop()+" · P."+p.pag;
   vsEl("vs-abrir").innerHTML=htmlLinkDoc(p.pdfI,p.pag,"ABRIR O PDF NESTA PÁGINA");
+  vsArMostra(p);
   vsEl("vs-ant").disabled=VS.i<=0;
   vsEl("vs-prox").disabled=VS.i>=VS.lista.length-1;
   var tira=vsEl("vs-tira"), ht="";
@@ -4154,6 +4200,32 @@ function vsMostra(i){
   else img.onload=function(){vsEnquadra();};
   // a ficha acompanha a escolha feita dentro do visor
   S.prIdx=VS.i;
+}
+// Posiciona o pino EM CIMA do QR impresso e acende o botao do rodape.
+// Duas portas para o mesmo destino: o pino para quem ja esta olhando a
+// prancha, o botao para quem esta com zoom longe do canto do QR.
+function vsArMostra(p){
+  var pino=vsEl("vs-ar-pino"), bt=vsEl("vs-ar"), ra=ra3dDa(p);
+  if(!pino||!bt) return;
+  if(!ra){
+    pino.style.display="none"; pino.removeAttribute("href");
+    bt.style.display="none";   bt.removeAttribute("href");
+    return;
+  }
+  var rot=(p.leg||("página "+p.pag));
+  pino.href=ra.url;
+  pino.title="Ver o dispositivo em 3D / realidade aumentada — "+rot;
+  pino.setAttribute("aria-label",pino.title);
+  // fracao da pagina -> px da imagem natural; 3% de folga para a moldura
+  // verde nao tapar os modulos do QR, que continua legivel por baixo
+  var fx=p.w*ra.w*0.06, fy=p.h*ra.h*0.06;
+  pino.style.left  =(p.w*ra.x-fx)+"px";
+  pino.style.top   =(p.h*ra.y-fy)+"px";
+  pino.style.width =(p.w*ra.w+2*fx)+"px";
+  pino.style.height=(p.h*ra.h+2*fy)+"px";
+  pino.style.display="block";
+  bt.href=ra.url;
+  bt.style.display="inline-flex";
 }
 function vsAbrir(lista,i,cod,desc,voltarPara){
   if(!lista||!lista.length) return;
@@ -4212,13 +4284,23 @@ function vsZoom(fator,cx,cy){
   mold.addEventListener("dblclick",vsEnquadra);
   mold.addEventListener("pointerdown",function(ev){
     VS.arrastando=true; VS.px=ev.clientX; VS.py=ev.clientY;
+    VS.px0=ev.clientX; VS.py0=ev.clientY; VS.moveu=false;
     mold.classList.add("arrastando");
-    try{mold.setPointerCapture(ev.pointerId);}catch(e){}
+    // Capturar o ponteiro EM CIMA do pino engoliria o clique do link. Sem a
+    // captura o arrasto continua valendo ali (o pino e pequeno e ficar morto
+    // ao toque seria pior); quem separa tocar de arrastar e VS.moveu.
+    if(!(ev.target&&ev.target.id==="vs-ar-pino"))
+      try{mold.setPointerCapture(ev.pointerId);}catch(e){}
   });
   mold.addEventListener("pointermove",function(ev){
     if(!VS.arrastando) return;
+    if(!VS.moveu&&(Math.abs(ev.clientX-VS.px0)>4||Math.abs(ev.clientY-VS.py0)>4)) VS.moveu=true;
     VS.x+=ev.clientX-VS.px; VS.y+=ev.clientY-VS.py;
     VS.px=ev.clientX; VS.py=ev.clientY; vsAplica();
+  });
+  // arrastou a prancha segurando o pino: era panorama, nao era pedido de RA
+  vsEl("vs-ar-pino").addEventListener("click",function(ev){
+    if(VS.moveu){ev.preventDefault();VS.moveu=false;}
   });
   function solta(){VS.arrastando=false;mold.classList.remove("arrastando");}
   mold.addEventListener("pointerup",solta);

@@ -1,7 +1,12 @@
 /* Service worker do BUSCADOR DE BANCOS V5 — gerado por publicar_pages.py.
    Cache versionado pelo build: publicar build novo troca este arquivo inteiro. */
 'use strict';
-const CACHE = 'buscador-v5-d545e281';
+/* 17/09/2026 - sufixo -ra1: o index.html deste build ganhou o pino de
+   realidade aumentada nas pranchas. Sem virar o nome do cache, quem ja
+   tem o app instalado seguiria servindo o index ANTIGO do cache e a
+   novidade nunca chegaria ao aparelho. O proximo build regenera este
+   arquivo e o sufixo some sozinho. */
+const CACHE = 'buscador-v5-d545e281-ra1';
 const CACHE_FONTES = 'buscador-fontes-v1';
 /* index UMA vez so no PRECACHE ('./' fora): com './' e './index.html' o addAll
    baixava e guardava os 37 MB em DOBRO (medido 01/09/2026); toda navegacao e
