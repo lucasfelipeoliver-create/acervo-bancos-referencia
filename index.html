@@ -5158,8 +5158,12 @@ function fechamentoCensoInterno(){
      e a ficha ficam com zoom 1 dentro do #app (herdam o do pai; zoom nao se compoe em cascata como transform). */
   /* --m-esc e' NUMERO puro gravado pelo mobile_android.js (innerWidth/412, entre 1 e 1,9): `calc(100vw / 412)` da'
      um COMPRIMENTO e `zoom` exige numero — o Chromium ignorava e ficava em 1 (medido 17/09, portao de escala). */
+  /* 17/09 08:39 (captura dele): zoom em ELEMENTOS internos com position:fixed estoura a largura no Chrome Android
+     (o layout media 900, o texto 1,9x — precos e barra sumiam pela direita); no Playwright nao reproduz. A escala
+     vai para a RAIZ do documento (html{zoom}), onde o motor recalcula innerWidth/vw/vh coerentes — e' a tecnica
+     de "enquadrar", nao de ampliar. O fator e' dele: A+/A- no menu Mais, guardado no aparelho (codice.escala). */
   :root{--m-esc:1}
-  #app,#m-nav,#m-mais,#m-toast,#gaveta-filtros,.m-ficha-acoes,#camada-modal,#visor{zoom:var(--m-esc)}
+  html{zoom:var(--m-esc)}
   #app{display:flex!important;flex-direction:column;padding:0;padding-bottom:72px;background:var(--fundo)}
   #app::before{content:none}
 
@@ -5525,11 +5529,16 @@ function fechamentoCensoInterno(){
       '<button class="it" data-m-mais="analitica"'+(ba&&!ba.hidden?"":" hidden")+'>'+ICONES.comp+'<span>Composição analítica<span class="sub">memória de cálculo pela metodologia do banco</span></span></button>'+
       '<button class="it" data-m-mais="copiar"'+(S.fichaAberta?"":" hidden")+'>'+ICONES.share+'<span>Copiar link do código<span class="sub">abre a ficha direto em qualquer aparelho</span></span></button>'+
       '<button class="it" data-m-mais="instalar"'+(M.instalar&&!M.app?"":" hidden")+'>'+ICONES.play+'<span>Instalar o app<span class="sub">ícone na tela inicial · funciona sem internet</span></span></button>'+
+      '<div class="it" data-m-mais="tamanho" style="cursor:default"><span style="font-weight:700;font-size:18px;color:var(--azulb)">Aa</span><span style="flex:1">Tamanho do texto<span class="sub">ajuste para a sua tela · '+Math.round(ajusteDele()*100)+'%</span></span>'+
+      '<button type="button" data-m-esc="-1" style="width:48px;height:44px;border:1px solid var(--cbd);border-radius:10px;background:#fff;font-size:18px;font-weight:700">A−</button>'+
+      '<button type="button" data-m-esc="1" style="width:48px;height:44px;border:1px solid var(--cbd);border-radius:10px;background:#fff;font-size:20px;font-weight:700;margin-left:6px">A+</button></div>'+
       '<button class="it" data-m-mais="bases">'+ICONES.base+'<span>Data-base dos bancos<span class="sub">'+esc_(bases||"nenhum banco ligado")+'</span></span></button>'+
       '<button class="it" data-m-mais="sobre"'+(https?"":" hidden")+'>'+ICONES.sobre+'<span>Sobre e privacidade<span class="sub">sem cadastro, sem coleta de dados</span></span></button>';
     m.classList.add("on"); $("m-mais-veu").classList.add("on"); rotaAbrir("mais"); navAtivo();
     m.onclick=function(ev){
-      var b=ev.target.closest("[data-m-mais]"); if(!b) return;
+      var e=ev.target.closest("[data-m-esc]");
+      if(e){ escalaAjustar(0.1*parseInt(e.getAttribute("data-m-esc"),10)); var sub=m.querySelector('[data-m-mais="tamanho"] .sub'); if(sub) sub.textContent="ajuste para a sua tela · "+Math.round(ajusteDele()*100)+"%"; ev.stopPropagation(); return; }
+      var b=ev.target.closest("[data-m-mais]"); if(!b||b.getAttribute("data-m-mais")==="tamanho") return;
       var q=b.getAttribute("data-m-mais");
       if(q==="comparar"){ maisFechar(); var x=$("btn-comparar"); if(x) x.click(); }
       else if(q==="excel"){ maisFechar(); var y=$("btn-excel"); if(y) y.click(); }
@@ -5593,11 +5602,23 @@ function fechamentoCensoInterno(){
   window.addEventListener("beforeinstallprompt",function(e){ e.preventDefault(); M.instalar=e; });
   // ESCALA por largura (17/09, "continua meio pequeno"): fator = innerWidth/412 (celular de referência do canvas),
   // entre 1 e 1,9, gravado em --m-esc (número puro); o CSS aplica por zoom ao app e ao que é fixo. Fora da camada = 1.
+  // 17/09 08:39: zoom em elemento interno estourou a largura no Chrome Android (nao reproduzivel no Playwright).
+  // Agora: html{zoom} (raiz), fator automatico = innerWidth/412 com teto 1,6, e AJUSTE DELE por A+/A- no menu Mais
+  // (multiplicador 0,7..1,6 guardado em localStorage codice.escala) — o motor real e' o do aparelho, nao o meu.
+  function ajusteDele(){ try{ var v=parseFloat(localStorage.getItem("codice.escala")); return isFinite(v)&&v>0?v:1; }catch(_e){ return 1; } }
   function escala(){
-    var f=celular()?Math.min(1.9,Math.max(1,window.innerWidth/412)):1;
+    if(!celular()){ document.documentElement.style.removeProperty("--m-esc"); M.escala=1; return; }
+    var auto=Math.min(1.6,Math.max(1,window.innerWidth/412));
+    var f=Math.min(2.5,Math.max(0.7,auto*ajusteDele()));
     document.documentElement.style.setProperty("--m-esc",String(Math.round(f*100)/100));
-    M.escala=f;
+    M.escala=f; M.escalaAuto=auto;
   }
+  function escalaAjustar(delta){
+    var v=Math.min(1.6,Math.max(0.7,Math.round((ajusteDele()+delta)*10)/10));
+    try{ localStorage.setItem("codice.escala",String(v)); }catch(_e){}
+    escala(); toast("Tamanho "+Math.round(v*100)+"%");
+  }
+  M.escalaAjustar=escalaAjustar;
   window.addEventListener("resize",escala); window.addEventListener("orientationchange",escala);
   function ligar(){
     escala();
