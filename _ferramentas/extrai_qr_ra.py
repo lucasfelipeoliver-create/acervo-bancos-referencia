@@ -33,6 +33,50 @@ import pymupdf
 BASE_AR = "https://3dwarehouse.sketchup.com/ar-view/"
 
 
+def _variantes(arr):
+    """Versoes da mesma imagem, da mais barata para a mais teimosa.
+
+    ACHADO 17/09/2026 — 4 das 35 pranchas do DER-MG (paginas 22, 44, 54 e 58)
+    TEM o QR impresso e mesmo assim nao decodificavam no 1x: o JPEG embutido
+    do PDF chega com artefato bastante para confundir o detector. Ampliar 2x a
+    4x resolve todas. A versao anterior desta ferramenta parou no 1x e eu
+    tratei o silencio como "esta prancha nao tem modelo" — nao tinha; ela
+    tinha QR e faltou insistir. Por isso a escada abaixo, e por isso ela vai
+    ate 6x antes de desistir.
+    """
+    cinza = cv2.cvtColor(arr, cv2.COLOR_BGR2GRAY)
+    yield cinza
+    for escala in (2, 3, 4, 6):
+        yield cv2.resize(cinza, None, fx=escala, fy=escala,
+                         interpolation=cv2.INTER_CUBIC)
+        yield cv2.resize(cinza, None, fx=escala, fy=escala,
+                         interpolation=cv2.INTER_NEAREST)
+    _, otsu = cv2.threshold(cinza, 0, 255,
+                            cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    yield otsu
+    for escala in (2, 3, 4, 6):
+        yield cv2.resize(otsu, None, fx=escala, fy=escala,
+                         interpolation=cv2.INTER_NEAREST)
+    _, borrado = cv2.threshold(cv2.GaussianBlur(cinza, (3, 3), 0), 0, 255,
+                               cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    yield borrado
+    for escala in (3, 4, 6):
+        yield cv2.resize(borrado, None, fx=escala, fy=escala,
+                         interpolation=cv2.INTER_NEAREST)
+
+
+def decodifica(det, arr):
+    """Le o QR tentando a escada inteira; devolve "" se nenhuma versao ler."""
+    for versao in _variantes(arr):
+        try:
+            texto, _, _ = det.detectAndDecode(versao)
+        except cv2.error:
+            continue
+        if texto:
+            return texto
+    return ""
+
+
 def extrai(raiz_documentos, manifesto_pranchas):
     """Devolve {chave: [uuid, x, y, w, h]} para as pranchas que tem QR."""
     por_pdf = collections.defaultdict(list)
@@ -67,7 +111,7 @@ def extrai(raiz_documentos, manifesto_pranchas):
                 # o QR e quadrado: descarta figura e foto antes de decodificar
                 if abs(larg - alt) > max(larg, alt) * 0.12 or larg < 80:
                     continue
-                texto, _, _ = det.detectAndDecode(arr)
+                texto = decodifica(det, arr)
                 if not texto or not texto.startswith(BASE_AR):
                     continue
                 caixas = pagina.get_image_rects(xref)
