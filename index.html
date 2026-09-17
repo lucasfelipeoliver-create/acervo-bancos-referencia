@@ -5147,7 +5147,9 @@ function fechamentoCensoInterno(){
 #faixa-base > .fb-tog + div::before{content:"·";margin:0 8px;color:var(--cbd,#cbd2d9)}
 #faixa-base.fb-recolhida > .fb-tog + .dir::before,#faixa-base > .fb-tog + div[data-bases]::before{content:"·";margin:0 8px;color:var(--cbd,#cbd2d9)}
 
-@media (max-width: 767px){
+/* 17/09/2026 — medido no aparelho dele (captura 07:38): celular com largura CSS > 767 px renderizava o DESKTOP
+   dentro do app. A camada vale para TELA DE TOQUE EM RETRATO (qualquer largura) ou para janela estreita. */
+@media (max-width: 767px), ((pointer: coarse) and (orientation: portrait) and (max-width: 1100px)){
   :root{--faint:#6b7280;--tinta-muted:#5f6670;--apagado:#5f6670}
   html,body{overscroll-behavior-y:contain}
   #app{display:flex!important;flex-direction:column;padding:0;padding-bottom:72px;background:var(--fundo)}
@@ -5284,7 +5286,7 @@ function fechamentoCensoInterno(){
 (function(){
   if(typeof S!=="object"||typeof renderFichaLateral!=="function"){ return; }
   var M=window.__codiceMobile={rotas:[],ignorarPop:0,instalar:null,app:false,pronto:false};
-  var MQ=window.matchMedia?window.matchMedia("(max-width: 767px)"):{matches:false};
+  var MQ=window.matchMedia?window.matchMedia("(max-width: 767px), ((pointer: coarse) and (orientation: portrait) and (max-width: 1100px))"):{matches:false};
   function celular(){ return !!MQ.matches; }
   function $(id){ return document.getElementById(id); }
   M.app=(document.referrer&&document.referrer.indexOf("android-app://")===0)||
