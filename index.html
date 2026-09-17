@@ -778,6 +778,37 @@
   .alerta-bloco{border-radius:8px;border-color:#f0d9a8;background:#fff7e6}
   .alerta-bloco .sev{font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:11px;letter-spacing:.03em;color:#b42318}
   .alerta-bloco .tx{font-size:13px;text-transform:none}
+  /* 17/09/2026 — ALERTAS DE ORÇAMENTO como tabela de decisão (L2) */
+  .alt-cab{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:2px 0 10px}
+  .alt-chip{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:3px}
+  .alt-chip-b{background:#9c3327;color:#fff}.alt-chip-i{background:#0b4f8a;color:#fff}.alt-chip-a{background:#e8702a;color:#fff}
+  .alt-leg{font-size:11.5px;color:var(--apagado)}
+  .alt-tab{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.4;text-transform:none;background:#fff;border:1px solid var(--cbd);border-radius:8px;overflow:hidden}
+  .alt-tab th{background:#0b2a4a;color:#fff;text-align:left;padding:7px 10px;font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .alt-tab td{padding:8px 10px;vertical-align:top;border-top:1px solid #e3e8ee}
+  .alt-tab .alt-c1{width:150px}
+  .alt-tab td.alt-c1{font-weight:600;color:var(--texto)}
+  .alt-tab .alt-c3{width:26%}
+  .alt-tab .alt-c4{width:150px}
+  .alt-tab td.alt-c4{font-size:10.5px;color:#0b4f8a;word-break:break-word}
+  .alt-tab tr.alt-r-blq td{background:#fff5f4}
+  .alt-tab tr.alt-r-omi td{background:#fffaf3}
+  .alt-blq{color:#9c3327}.alt-blq b,.alt-omi b{font-weight:700}
+  .alt-omi{color:#b4530f}
+  .alt-vazio{color:var(--apagado)}
+  .alt-q{font-style:italic;color:#3d4f5c}
+  .alt-conf{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:#0b4f8a}
+  .alt-pre{font-weight:600;margin-bottom:3px}
+  .alt-ol,.alt-ul{margin:0;padding-left:18px}
+  .alt-ol li,.alt-ul li{margin:0 0 2px}
+  .alt-mo-l{padding:4px 0}
+  .alt-mo-l+.alt-mo-l{border-top:1px dashed #e3e8ee}
+  .alt-mo-g{font-weight:600;display:block;margin-bottom:2px}
+  .alt-mo-off{color:var(--apagado)}
+  .alt-mo-on .alt-mo-g{color:#0b4f8a}
+  .alt-tag{font-family:"IBM Plex Mono",monospace;font-size:9px;font-weight:700;letter-spacing:.08em;background:#e8702a;color:#fff;padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+  .alt-nota{color:#5b6f77}
+  .alt-fontes{font-size:10px;color:var(--apagado);margin-top:8px}
   .tab-ana th{font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:11px;letter-spacing:.03em}
   .tab-ana{font-size:13px}
 
@@ -2720,6 +2751,117 @@ function escProvaTexto(c,e){
   if(tipo===4){var lst=(e[1]===4?c[F.INC]:c[F.EXC])||[];return "DESCRIÇÃO: "+String(lst[ref]||"");}
   return "";
 }
+// 17/09/2026 — ALERTAS DE ORÇAMENTO como TABELA DE DECISÃO (direção L2, aprovada por ele no canvas
+// claude.ai/artifact/RA9eT8kPKhczh4pXmNr4im). Colunas: item · JÁ incluso no preço (não orçar à parte) ·
+// falta apropriar · fonte. NADA é resumido: o texto de cada mensagem do dataset (alertas_molde_v3.csv,
+// "[SEV] CODIGO: texto" por linha) vai inteiro para a célula — a tabela só distribui e ordena.
+// Regra dele (17/09, 00:5x): mão de obra do caderno sai UMA LINHA POR TIPO de dispositivo, e o tipo
+// que casa com a descrição do código consultado fica em destaque; os outros, apagados.
+var ALT_TEMA={TRANSPORTE_A_APROPRIAR:"Transporte do insumo",TEMPO_FIXO_INCLUSO:"Transporte do insumo",
+  SICRO_TEMPO_FIXO:"Transporte do insumo",TRANSPORTE_EMBUTIDO:"Transporte do insumo",
+  SICRO_PARCELA_MO:"Mão de obra (SICRO)",SICRO_FATOR_K:"Equipamento (fator k)",SEM_CUSTO:"Insumo sem custo",
+  INSUMO_SEM_PRECO:"Insumo sem preço",PENDENCIA_EXCLUSAO:"Exclusão pendente",CONEXAO_INCLUSA:"Conexão inclusa",
+  SELECAO_CODIGO:"Seleção do código",VOLUME_MEDIDO:"Volume medido",INSUMO_EMBUTIDO:"Insumo embutido",
+  FIC_EMBUTIDO:"FIC",FIC_CONDICIONAL:"FIC",FIC_SEM_PARCELA:"FIC",FIC_NAO_INCIDE:"FIC",
+  SICRO_SEM_ENUMERACAO:"Escopo do caderno",PENDENCIA_SUBSTITUICAO:"Substituição pendente"};
+var ALT_JA_INCLUSO={TEMPO_FIXO_INCLUSO:1,SICRO_TEMPO_FIXO:1,SICRO_PARCELA_MO:1,SICRO_FATOR_K:1,INSUMO_EMBUTIDO:1,
+  FIC_EMBUTIDO:1,FIC_CONDICIONAL:1,FIC_SEM_PARCELA:1,FIC_NAO_INCIDE:1,CONEXAO_INCLUSA:1,TRANSPORTE_EMBUTIDO:1};
+function altHumano(cod){ return String(cod||"").replace(/_/g," ").toLowerCase().replace(/^./,function(x){return x.toUpperCase();}); }
+function altFontes(t){ // regras (R-XX-NN) e páginas citadas no texto → coluna FONTE, sem repetir
+  var f=[], re=/R-[A-Z]+-\d+|(?:SICRO )?V01 p\.[\d\-\/]+|§[\d.]+|\bp\.\d+(?:-\d+)?/g, m;
+  while((m=re.exec(t))){ if(f.indexOf(m[0])<0) f.push(m[0]); }
+  return f.join(" · ");
+}
+function altTexto(t){ // texto INTEIRO; só a citação «…» e o [confirmam: …] ganham estilo próprio
+  return esc(t).replace(/«([^»]*)»/g,'<span class="alt-q">«$1»</span>')
+               .replace(/\[(confirmam:[^\]]*)\]/g,'<span class="alt-conf">[$1]</span>');
+}
+function altLista(corpo,sep){ // "x; - a; - b" ou "a | b" → itens; nunca descarta pedaço
+  var partes=corpo.split(sep).map(function(x){return x.replace(/^[\s\-–]+/,"").trim();}).filter(Boolean);
+  return partes;
+}
+function altEscopoLinhas(txt,desc){
+  // "[INFO] SICRO_ESCOPO (INCLUI_LITERAL — …): o preço JÁ remunera etapas (p.136): … ‖ materiais … (p.138): a | b ‖ mão de obra (p.137): em bocas … tipo X: - …; - … | em bocas … Y: - …. Orçar … DUPLICIDADE. CRITÉRIO DE MEDIÇÃO (p.140): … ⚠ nota"
+  var linhas=[], cab="", corpo=txt;
+  var ic=txt.indexOf("): ");
+  if(/^\(/.test(txt.trim())&&ic>0){ cab=txt.slice(1,ic); corpo=txt.slice(ic+3); }
+  var nota="", iN=corpo.indexOf(" ⚠ ");
+  if(iN>=0){ nota=corpo.slice(iN+3).trim(); corpo=corpo.slice(0,iN); }
+  var med="", iM=corpo.indexOf("CRITÉRIO DE MEDIÇÃO");
+  if(iM>=0){ med=corpo.slice(iM); corpo=corpo.slice(0,iM).replace(/\s*Orçar qualquer destes itens à parte é DUPLICIDADE\.?\s*$/,""); }
+  var descN=normTxt(desc||"");
+  corpo.split(" ‖ ").forEach(function(bl){
+    bl=bl.trim(); if(!bl) return;
+    var m=bl.match(/^(.*?)\s*\((p\.[\d\-\/]+)\):\s*([\s\S]*)$/);
+    var rot=m?m[1]:bl, pag=m?m[2]:"", c=m?m[3]:"";
+    rot=rot.replace(/^o preço JÁ remunera\s*/i,"");
+    var html="";
+    if(/^etapas/i.test(rot)){
+      var it=c.match(/^([^:]*tipo[^:]*):\s*([\s\S]*)$/); var pre=it?it[1]:"", lst=altLista(it?it[2]:c,/;\s*-\s*|;\s+/);
+      html=(pre?'<div class="alt-pre">'+esc(pre)+'</div>':'')+'<ol class="alt-ol">'+lst.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ol>';
+    } else if(/^mão de obra/i.test(rot)){
+      var grupos=c.split(" | "), algum=false, lin=grupos.map(function(g){
+        var gm=g.match(/^(em [^:]*):\s*([\s\S]*)$/); var gr=gm?gm[1]:"", gi=altLista(gm?gm[2]:g,/;\s*-\s*|;\s+/);
+        var siglas=(gr.match(/\b[A-Z]{2,6}\b/g)||[]), casa=siglas.some(function(s){return descN.indexOf(normTxt(s))>=0;});
+        if(casa) algum=true;
+        return {gr:gr,gi:gi,casa:casa};
+      });
+      html='<div class="alt-mo">'+lin.map(function(l){
+        var cls=algum?(l.casa?" alt-mo-on":" alt-mo-off"):"";
+        return '<div class="alt-mo-l'+cls+'"><span class="alt-mo-g">'+esc(l.gr)+(l.casa?' <span class="alt-tag">ESTE CÓDIGO</span>':'')+'</span><ul class="alt-ul">'+l.gi.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+      }).join("")+'</div>';
+    } else {
+      html='<ul class="alt-ul">'+altLista(c," | ").map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>';
+    }
+    linhas.push({tema:rot.replace(/^./,function(x){return x.toUpperCase();}),ja:html,falta:"",fonte:(cab?cab.replace(/^INCLUI_LITERAL — [^,]*,\s*/,"")+" · ":"")+pag});
+  });
+  if(med){
+    var mm=med.match(/^CRITÉRIO DE MEDIÇÃO\s*\((p\.[\d\-\/]+)\):\s*([\s\S]*)$/);
+    linhas.push({tema:"Medição",ja:'<div>'+esc(mm?mm[2]:med)+'</div>',falta:nota?'<div class="alt-nota">'+esc(nota)+'</div>':"",fonte:mm?mm[1]:""});
+  } else if(nota){
+    linhas.push({tema:"Limite",ja:"",falta:'<div class="alt-nota">'+esc(nota)+'</div>',fonte:""});
+  }
+  return linhas;
+}
+function alertasTabelaHTML(al,c){
+  var linhas=[], porTema={}, nB=0, nI=0, nA=0, fontes=[];
+  function linha(tema,ja,falta,fonte,sev){
+    var k=tema; if(!porTema[k]){ porTema[k]={tema:tema,ja:[],falta:[],fonte:[],sev:""}; linhas.push(porTema[k]); }
+    var L=porTema[k]; if(ja) L.ja.push(ja); if(falta) L.falta.push(falta);
+    if(fonte&&L.fonte.indexOf(fonte)<0) L.fonte.push(fonte); if(sev==="BLOQUEIO") L.sev="BLOQUEIO"; else if(sev&&!L.sev) L.sev=sev;
+  }
+  al.forEach(function(a){
+    if(a[4]&&fontes.indexOf(a[4])<0) fontes.push(a[4]);
+    String(a[2]||"").split(/\r?\n/).forEach(function(msg){
+      msg=msg.trim(); if(!msg) return;
+      var m=msg.match(/^\[(BLOQUEIO|INFO|ALERTA|AVISO)\]\s+([A-Z_]+)\s*([\s\S]*)$/);
+      if(!m){ linha(altHumano(a[1]),"",altTexto(msg),altFontes(msg),a[0]); return; }
+      var sev=m[1], cod=m[2], resto=m[3].replace(/^:\s*/,"");
+      if(sev==="BLOQUEIO") nB++; else if(sev==="INFO") nI++; else nA++;
+      if(cod==="SICRO_ESCOPO"){
+        altEscopoLinhas(resto,c?c[F.DESC]:"").forEach(function(l){ linha(l.tema,l.ja,l.falta,l.fonte,"INFO"); });
+        return;
+      }
+      var tema=ALT_TEMA[cod]||altHumano(cod), fonte=altFontes(resto);
+      if(cod==="SICRO_FATOR_K"&&resto.indexOf(" ⚠ CONTRAPARTE")>=0){
+        var p=resto.split(" ⚠ CONTRAPARTE"); linha(tema,'<div>'+altTexto(p[0])+'</div>','<div class="alt-omi">'+altTexto("CONTRAPARTE"+p[1])+'</div>',fonte,sev); return;
+      }
+      var ja=ALT_JA_INCLUSO[cod]||sev==="INFO";
+      linha(tema, ja?'<div>'+altTexto(resto)+'</div>':"", ja?"":'<div class="'+(sev==="BLOQUEIO"?"alt-blq":"alt-omi")+'">'+altTexto(resto)+'</div>', fonte, sev);
+    });
+  });
+  var h='<div class="sec alt-sec"><div class="st">ALERTAS DE ORÇAMENTO — '+al.length+'</div>'+
+    '<div class="alt-cab">'+(nB?'<span class="alt-chip alt-chip-b">'+nB+' BLOQUEIO'+(nB>1?'S':'')+'</span>':'')+
+    (nI?'<span class="alt-chip alt-chip-i">'+nI+' INFO</span>':'')+(nA?'<span class="alt-chip alt-chip-a">'+nA+' ALERTA'+(nA>1?'S':'')+'</span>':'')+
+    '<span class="alt-leg">JÁ incluso = não orçar à parte (duplicidade) · falta apropriar = omissão se não lançar</span></div>'+
+    '<table class="alt-tab"><thead><tr><th class="alt-c1">Item</th><th>JÁ incluso no preço (não orçar à parte)</th><th class="alt-c3">Falta apropriar</th><th class="alt-c4">Fonte</th></tr></thead><tbody>';
+  linhas.forEach(function(L){
+    h+='<tr class="'+(L.sev==="BLOQUEIO"?'alt-r-blq':(L.falta.length?'alt-r-omi':''))+'"><td class="alt-c1">'+esc(L.tema)+'</td><td>'+(L.ja.join("")||'<span class="alt-vazio">—</span>')+'</td>'+
+       '<td class="alt-c3">'+(L.falta.join("")||'<span class="alt-vazio">—</span>')+'</td><td class="alt-c4 mono">'+esc(L.fonte.join(" · "))+'</td></tr>';
+  });
+  h+='</tbody></table>'+(fontes.length?'<div class="alt-fontes mono">'+esc(fontes.join(" | "))+'</div>':'')+'</div>';
+  return h;
+}
 function escopoHTML(c,completa){
   var sec=completa?'sec':'fic-sec', st=completa?'st':'fic-st';
   var inc=c[F.INC]||[], exc=c[F.EXC]||[], fr=c[F.ESCT]||[], chk=c[F.CHK]||[];
@@ -3621,13 +3763,7 @@ function abrirFicha(chave){
   h+=escopoHTML(c,true);
   var al=ALERTAS?ALERTAS[chaveDados(c)]:null;
   if(al&&al.length){
-    h+='<div class="sec"><div class="st">ALERTAS DE ORÇAMENTO — '+al.length+'</div>';
-    al.forEach(function(a){
-      h+='<div class="alerta-bloco"><div class="sev">'+esc(a[0])+' · '+esc(a[1])+'</div><div class="tx fonte-original">'+esc(a[2])+'</div>'+
-         (a[3]?'<div class="tx fonte-original" style="color:var(--muted)">JÁ INCLUI: '+esc(a[3])+'</div>':'')+
-         (a[4]?'<div class="mono" style="font-size:9px;color:var(--faint);margin-top:3px">'+esc(a[4])+'</div>':'')+'</div>';
-    });
-    h+='</div>';
+    h+=alertasTabelaHTML(al,c);   // 17/09/2026: tabela de decisão (direção L2 aprovada por ele)
   }
   if(c[F.CRIT].length){
     h+='<div class="sec"><div class="st">CRITÉRIO DE MEDIÇÃO — TRANSCRITO DO CADERNO</div>';
