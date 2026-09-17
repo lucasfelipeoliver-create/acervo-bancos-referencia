@@ -6,7 +6,7 @@
    tem o app instalado seguiria servindo o index ANTIGO do cache e a
    novidade nunca chegaria ao aparelho. O proximo build regenera este
    arquivo e o sufixo some sozinho. */
-const CACHE = 'buscador-v5-d545e281-ra2';
+const CACHE = 'buscador-v5-d545e281-ra3';
 const CACHE_FONTES = 'buscador-fontes-v1';
 /* index UMA vez so no PRECACHE ('./' fora): com './' e './index.html' o addAll
    baixava e guardava os 37 MB em DOBRO (medido 01/09/2026); toda navegacao e
