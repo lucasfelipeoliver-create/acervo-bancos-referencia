@@ -4967,9 +4967,15 @@ function fechamentoCensoInterno(){
     var reg={locs:null,pend:null,externa:src}; PRECOS.fat[k]=reg;
     reg.pend=new Promise(function(res,rej){
       _resolvers[String(banco).toLowerCase()+"|"+ed]=res;
-      var s=document.createElement("script"); s.async=true; s.src=src;
-      s.onerror=function(){ rej(new Error("FATIA EXTERNA NAO CARREGOU: "+src)); };
-      document.head.appendChild(s);
+      var tent=0;
+      var pedir=function(){
+        tent++;
+        var s=document.createElement("script"); s.async=true;
+        s.src=src+(tent>1?"?r="+tent:"");   // conexao derrubada no meio do download (4G, servidor): UMA retentativa
+        s.onerror=function(){ s.remove(); if(tent<2){ setTimeout(pedir,400); } else { rej(new Error("FATIA EXTERNA NAO CARREGOU: "+src)); } };
+        document.head.appendChild(s);
+      };
+      pedir();
       setTimeout(function(){ rej(new Error("FATIA EXTERNA SEM RESPOSTA EM 60 S: "+src)); },60000);
     }).then(function(){
       window.__fatiasExternas.carregadas++;
@@ -4985,49 +4991,476 @@ function fechamentoCensoInterno(){
 })();
 
 </script>
+<style id="codice-mobile">
+/* CAMADA ANDROID / CELULAR do Códice — canvas "Rodada 5 · app Android" aprovado em 16/09/2026 (mecânica M2:
+   lista compacta + folha; M3 ficha em tela cheia com VOLTAR; filtros em folha de baixo; barra inferior
+   Buscar · Filtros · Acervo · Mais). Só vale ≤ 767 px: o desktop e o notebook ficam intocados.
+   Substitui a camada `pwa-mobile` que o publicador injetava (02/09, seletores da pele B1): o produto passa
+   a ser dono do celular; o publicador segue dono do viewport, manifest e service worker.
+   Tokens: corpo ≥ 14 px, rótulo ≥ 12 px, alvo de toque ≥ 48 px. Cinzas de rótulo trocados por tons que
+   passam AA (≥ 4,5:1 sobre branco): #6b7280 (4,83) e #5f6670 (5,42). O laranja da marca (#e8702a) fica
+   como cor de BOTÃO (decisão do canvas B); não é usado como texto sobre branco nesta camada. */
+/* faixa de bancos/data-bases RETRÁTIL (pedido dele 17/09/2026) — vale em qualquer largura */
+#faixa-base .fb-tog{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;color:var(--texto,#1f2933);font-weight:600;white-space:nowrap;min-height:28px}
+#faixa-base .fb-tog .fb-seta{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;transition:transform .15s}
+#faixa-base.fb-recolhida .fb-tog .fb-seta{transform:rotate(-90deg)}
+/* recolhida: os itens COLAPSAM visualmente (largura/altura 0, sem quebra) mas continuam no fluxo e no innerText —
+   o portão do template (A14/C1) lê a faixa por innerText para exigir a declaração da data-base de cada banco */
+#faixa-base.fb-recolhida > div[data-bases]{width:0;height:0;overflow:hidden;margin:0;padding:0;font-size:0;line-height:0;white-space:nowrap}
+#faixa-base.fb-recolhida > div[data-bases]::before{content:none}
+#faixa-base > .fb-tog + div::before{content:"·";margin:0 8px;color:var(--cbd,#cbd2d9)}
+#faixa-base.fb-recolhida > .fb-tog + .dir::before,#faixa-base > .fb-tog + div[data-bases]::before{content:"·";margin:0 8px;color:var(--cbd,#cbd2d9)}
 
-<style id="pwa-mobile">
 @media (max-width: 767px){
-  #cab{height:auto;flex-wrap:wrap;padding:10px 12px;gap:10px}
-  #logo{order:1}
-  #acoes-cab{order:2;margin-left:auto}
-  #acoes-cab button{padding:6px 8px;font-size:9px}
-  #btn-comparar{display:none}
-  #caixa-busca{flex:1 1 100%;order:3;height:44px}
-  #faixa-base{padding:5px 12px;font-size:8.5px;gap:10px;flex-wrap:wrap}
-  #abas{padding:0 12px}
-  #lista-ctrl{flex-wrap:wrap;gap:10px;padding:9px 12px}
-  #lista-ctrl .sep{display:none}
-  .banco-seg{flex:1;padding:6px 4px}
-  #lista-facetas{flex-wrap:wrap;gap:8px;padding:8px 12px}
-  #lista-aviso{padding:6px 12px}
-  #preco-bar{margin:8px 12px 0 12px;flex-wrap:wrap;gap:8px}
-  #preco-painel{grid-template-columns:repeat(2, minmax(0, 1fr));margin:0 12px}
-  #trilho{display:none}
+  :root{--faint:#6b7280;--tinta-muted:#5f6670;--apagado:#5f6670}
+  html,body{overscroll-behavior-y:contain}
+  #app{display:flex!important;flex-direction:column;padding:0;padding-bottom:72px;background:var(--fundo)}
+  #app::before{content:none}
+
+  /* cabeçalho marinho: marca + busca em pílula de 48 px; as ações vão para a barra inferior e o menu Mais */
+  #cab{display:flex;flex-wrap:wrap;align-items:center;background:var(--marinho);height:auto;padding:10px 16px 12px;gap:10px}
+  #logo{order:1;gap:10px}
+  #logo .nome{font-size:17px}
+  #acoes-cab{display:none!important}
+  #caixa-busca{order:3;flex:1 1 100%;height:48px;margin:0;border-radius:24px;border:none;padding:0 16px}
+  #busca{font-size:16px}
+  #abas{display:none}
+  #lista-facetas{padding:8px 16px 0;gap:8px}
+  #lista-aviso{margin:8px 16px 0;font-size:13px}
+  .fcab{font-size:13px;padding:7px 12px;min-height:36px}
+
+  /* filtros F3 = folha de baixo, aberta pela barra inferior (classe m-filtros no #app) */
+  #lista-ctrl{display:none!important}
+  #app.m-filtros #lista-ctrl{display:flex!important;position:fixed;left:0;right:0;bottom:0;top:auto;height:72vh;z-index:60;
+    margin:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(11,42,74,.28);padding:14px 16px 16px;overflow:auto}
+  #app.m-filtros::after{content:"";position:fixed;inset:0;background:rgba(11,42,74,.35);z-index:59}
+  #filtros-cab .seta{display:none}
+  #filtros-cab .t{font-size:18px}
+  #lista-ctrl .rs{min-height:56px;padding:10px 4px}
+  #lista-ctrl .rs .t{font-size:12px}
+  #lista-ctrl .rs .v{font-size:15px}
+  #gaveta-filtros{left:0!important;right:0!important;width:auto!important;max-width:none!important;top:auto!important;bottom:0!important;
+    height:80vh!important;border-radius:22px 22px 0 0!important;z-index:61}
+  #gaveta-filtros .gv-ok{min-height:48px;display:inline-flex;align-items:center;padding:0 18px;font-size:14px;font-weight:700;border-radius:10px;background:var(--laranja);color:#fff}
+  #gaveta-filtros .gv-x{width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center}
+
+  /* lista compacta (M2): 2 linhas por código, código + preço na 1ª, descrição em 1 linha na 2ª */
+  #lista-wrap{margin:8px 0 0;border-radius:0;box-shadow:none;background:transparent}
   #lista-tab{padding:0}
-  #lista-tab.inteiro{padding:0}
-  #tab-lista{display:block;width:100%}
+  #tab-lista{display:block;width:100%;border:none}
+  #tab-lista thead{display:none}
   #tab-lista tbody{display:block}
   #tab-lista tr:not([data-lficha]){display:none}
-  #tab-lista tr[data-lficha]{display:flex;flex-wrap:wrap;align-items:baseline;
-    column-gap:8px;row-gap:3px;padding:10px 12px;border-bottom:1px solid var(--fio)}
-  #tab-lista td{display:block;padding:0;border:none;white-space:normal}
-  #tab-lista td:nth-child(1){order:2}
-  #tab-lista td:nth-child(2){order:1;font-size:13px;font-weight:600}
-  #tab-lista td:nth-child(3){order:5;flex:1 1 100%;font-size:11px;line-height:1.4;
-    color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;
-    -webkit-box-orient:vertical;overflow:hidden}
-  #tab-lista td:nth-child(4){order:3;margin-left:auto;font-size:10px}
-  #tab-lista td.pv-val{order:4;font-size:13px;font-weight:600;color:var(--azul)}
-  #tab-lista td.pv-val + td.pv-val{color:var(--azul-esc)}
-  .cbanco{font-size:8.5px;padding:1px 5px}
-  #lista-ficha.on{position:fixed;inset:0;z-index:55;background:var(--bg);
-    padding:0 0 12px 0;overflow:auto}
-  #lista-ficha.on .fic-cab{position:sticky;top:0;z-index:2}
-  .fic-x{padding:12px;margin:-11px -14px -11px auto;font-size:14px}
-  #rodape{padding:8px 12px;gap:10px;font-size:9px;flex-wrap:wrap}
+  #tab-lista tr[data-lficha]{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:3px;
+    min-height:56px;padding:8px 16px;background:#fff;border-bottom:1px solid var(--fioc)}
+  #tab-lista tr:nth-child(even) td{background:transparent}
+  #tab-lista tr.sel{background:#e8f0fa}
+  #tab-lista td{display:block;padding:0;border:none;white-space:normal;background:transparent!important;font-size:14px}
+  #tab-lista td:nth-child(1){order:1}
+  #tab-lista td:nth-child(2){order:2;font-size:13.5px;font-weight:500}
+  #tab-lista td:nth-child(3){order:5;flex:1 1 100%;font-size:14px;line-height:1.35;color:var(--texto);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  #tab-lista td:nth-child(4){order:3;font-size:12px;color:var(--apagado)}
+  #tab-lista td.pv-val{order:4;margin-left:auto;font-size:14px;font-weight:600;color:var(--texto)}
+  #tab-lista td.pv-val.pv-des{margin-left:0;font-weight:400;color:var(--apagado)}
+  #tab-lista .cbanco{font-size:10.5px;padding:2px 6px}
+  th.pv-th{width:auto}
+
+  /* ficha (M2 folha → M3 tela cheia): a ficha lateral ocupa a tela, com VOLTAR fixo no topo e ações no pé */
+  #lista-ficha{display:none}
+  #lista-ficha.on{display:block;position:fixed;inset:0;z-index:70;background:var(--fundo);padding:0 0 84px;overflow:auto;flex:none!important;border:none}
+  #lista-ficha.on .fic-cab{position:sticky;top:0;z-index:2;background:var(--marinho);color:#fff;padding:10px 12px 12px 56px;min-height:64px;border:none}
+  #lista-ficha.on .fic-cab .fic-cod{color:#fff;font-size:18px}
+  #lista-ficha.on .fic-cab .fic-sub{color:#c7d2e0;font-size:12px}
+  #lista-ficha.on .fic-cab .fic-uni{color:#fff}
+  #lista-ficha.on .fic-x{position:absolute;left:4px;top:8px;width:48px;height:48px;margin:0;padding:0;display:flex;align-items:center;justify-content:center;
+    font-size:0;color:#fff;border:none;background:transparent}
+  #lista-ficha.on .fic-x::before{content:"";width:12px;height:12px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(45deg);margin-left:6px}
+  #lista-ficha.on .fic-sec{padding:12px 16px;font-size:14px}
+  #lista-ficha.on .fic-st{font-size:12px}
+  #lista-ficha.on .fic-sec div[style*="font-size:12px"]{font-size:14px!important;line-height:1.4}
+  .m-ficha-acoes{position:fixed;left:0;right:0;bottom:0;z-index:71;height:72px;background:#fff;border-top:1px solid var(--fiob);
+    display:flex;align-items:center;gap:8px;padding:0 12px;box-sizing:border-box}
+  .m-ficha-acoes button{flex:1;height:48px;border-radius:10px;font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:14px;font-weight:600;
+    border:1px solid var(--cbd);background:#fff;color:var(--texto);display:flex;align-items:center;justify-content:center;gap:6px;text-transform:none;letter-spacing:0}
+  .m-ficha-acoes button.cheio{flex:1.3;background:var(--laranja);border-color:var(--laranja);color:#fff;font-family:"Montserrat","Segoe UI",system-ui,sans-serif;font-weight:700}
+
+  /* modais (ficha completa, comparar, acervo, Excel) em tela cheia */
+  .tela-cheia{padding:0}
+  .modal{max-width:none;max-height:none;height:100%;border-radius:0}
+  .modal-cab{padding:12px 16px;gap:12px}
+  .modal-cab .fechar{min-height:44px;padding:0 14px}
+  .sec{padding:12px 16px}
+  .fabas{gap:16px;padding:0 16px;overflow-x:auto}
+
+  /* rodapé vira linha discreta acima da barra */
+  #rodape{margin:0;padding:6px 16px;font-size:12px;flex-wrap:wrap;gap:8px}
+  #faixa-base{font-size:12px}
+  #faixa-base .fb-tog{min-height:36px}
+
+  /* barra inferior (Material 3): 4 destinos, alvo de 48 px, ativo com pílula clara */
+  #m-nav{position:fixed;left:0;right:0;bottom:0;height:72px;z-index:58;background:#fff;border-top:1px solid var(--fiob);
+    display:flex;align-items:center;padding:0 8px;box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom)}
+  #m-nav button{flex:1;height:64px;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:12px;font-weight:600;color:#5f6670;text-transform:none;letter-spacing:0;padding:0}
+  #m-nav button .ic{width:56px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+  #m-nav button.on{color:var(--marinho)} #m-nav button.on .ic{background:#dbe7f5}
+  #m-nav button svg{width:22px;height:22px;stroke:currentColor}
+  #m-nav button .n{position:absolute;margin:-30px 0 0 34px;background:var(--laranja);color:#fff;border-radius:9px;font-size:10px;font-weight:700;padding:1px 5px;font-family:"IBM Plex Mono",monospace}
+
+  /* menu Mais (folha de baixo) */
+  #m-mais{position:fixed;left:0;right:0;bottom:0;z-index:62;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(11,42,74,.28);
+    padding:8px 16px 16px;box-sizing:border-box;display:none;flex-direction:column;gap:2px;max-height:85vh;overflow:auto}
+  #m-mais.on{display:flex}
+  #m-mais .alca{width:36px;height:4px;background:#cbd2d9;border-radius:2px;align-self:center;margin-bottom:8px}
+  #m-mais .it{min-height:52px;display:flex;align-items:center;gap:14px;border:none;background:transparent;text-align:left;width:100%;padding:0 4px;
+    font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:15px;color:var(--texto);text-transform:none;letter-spacing:0;border-bottom:1px solid #eef1f4}
+  #m-mais .it .sub{display:block;font-size:12.5px;color:#5f6670;margin-top:1px}
+  #m-mais .it svg{width:22px;height:22px;flex-shrink:0;stroke:var(--azulb)}
+  #m-mais .it[hidden]{display:none}
+  #m-mais-veu{position:fixed;inset:0;background:rgba(11,42,74,.35);z-index:61;display:none}
+  #m-mais-veu.on{display:block}
+
+  /* aviso curto (toast) */
+  #m-toast{position:fixed;left:16px;right:16px;bottom:88px;z-index:80;background:var(--marinho);color:#fff;border-radius:10px;padding:12px 14px;
+    font-size:14px;display:none;box-shadow:0 8px 24px rgba(11,42,74,.3)}
+  #m-toast.on{display:block}
+
+  /* visor de prancha e dossiê ganham o espaço todo */
+  #visor{padding:0}
 }
+
 </style>
+<script id="mobile-android">
+// CAMADA ANDROID / CELULAR do Códice — lado do runtime (16/09/2026; canvas "Rodada 5 · app Android" aprovado).
+// Injetado DEPOIS do template (arquivo novo, template intocado). Quatro responsabilidades:
+//   1. ROTAS: ficha, gaveta de filtros, folha de filtros, menu Mais, modal e visor entram no history por
+//      pushState; o botão VOLTAR do Android (popstate) fecha o que está aberto — nunca o app. Vale em
+//      qualquer largura (no desktop o Alt+← passa a fechar a ficha, comportamento coerente).
+//   2. LINK PROFUNDO: ?cod=BANCO:CÓDIGO abre a ficha direto ao terminar o boot; a URL da ficha aberta é
+//      gravada por replaceState para o Compartilhar/Copiar link.
+//   3. COMPARTILHAR: navigator.share (Android) ou área de transferência, com código, descrição, preço no
+//      regime/localidade/data-base selecionados e o link — sempre com aviso (toast) do que aconteceu.
+//   4. UI DE CELULAR (≤ 767 px): barra inferior Buscar · Filtros · Acervo · Mais, filtros F3 como folha de
+//      baixo (#app.m-filtros), ficha em tela cheia com barra de ações, menu Mais (Comparar, Excel, Composição
+//      analítica, Instalar/Abrir, data-bases, privacidade). Reaproveita os handlers delegados do template:
+//      nada é religado, os botões do cabeçalho são clicados por procuração.
+(function(){
+  if(typeof S!=="object"||typeof renderFichaLateral!=="function"){ return; }
+  var M=window.__codiceMobile={rotas:[],ignorarPop:0,instalar:null,app:false,pronto:false};
+  var MQ=window.matchMedia?window.matchMedia("(max-width: 767px)"):{matches:false};
+  function celular(){ return !!MQ.matches; }
+  function $(id){ return document.getElementById(id); }
+  M.app=(document.referrer&&document.referrer.indexOf("android-app://")===0)||
+        (window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches);
+
+  // ---------- 1. rotas ----------
+  var FECHA={
+    ficha:function(){ S.fichaAberta=""; renderFichaLateral(); },
+    gaveta:function(){ if(typeof GAVETA!=="undefined"){ GAVETA=null; } repintarCtrl(); },
+    filtros:function(){ $("app").classList.remove("m-filtros"); navAtivo(); },
+    mais:function(){ maisFechar(); },
+    modal:function(){ fecharModal(); },
+    visor:function(){ vsFechar(); }
+  };
+  function rotaAbrir(tipo){
+    if(M.rotas.indexOf(tipo)>=0) return;
+    M.rotas.push(tipo);
+    try{ history.pushState({codice:tipo,n:M.rotas.length},""); }catch(_e){}
+  }
+  function rotaFechar(tipo){
+    var i=M.rotas.indexOf(tipo); if(i<0) return;
+    M.rotas.splice(i,1);
+    var st=history.state;
+    if(st&&st.codice===tipo){ M.ignorarPop++; try{ history.back(); }catch(_e){ M.ignorarPop--; } }
+  }
+  window.addEventListener("popstate",function(){
+    if(M.ignorarPop>0){ M.ignorarPop--; return; }
+    var t=M.rotas.pop(); if(!t) return;
+    var f=FECHA[t]; if(f) f();
+  });
+  M.rotaAbrir=rotaAbrir; M.rotaFechar=rotaFechar;
+
+  // ---------- ganchos nos pontos de abertura/fechamento (funções globais do template) ----------
+  var _renderFichaLateral=renderFichaLateral;
+  renderFichaLateral=function(){
+    var r=_renderFichaLateral.apply(this,arguments);
+    if(S.fichaAberta){ rotaAbrir("ficha"); urlDaFicha(); fichaAcoes(); }
+    else { rotaFechar("ficha"); urlLimpa(); }
+    navAtivo();
+    return r;
+  };
+  if(typeof repintarCtrl==="function"){
+    var _repintarCtrl=repintarCtrl;
+    repintarCtrl=function(){
+      var r=_repintarCtrl.apply(this,arguments);
+      if(typeof GAVETA!=="undefined"&&GAVETA) rotaAbrir("gaveta"); else rotaFechar("gaveta");
+      return r;
+    };
+  }
+  if(typeof abrirModal==="function"){
+    var _abrirModal=abrirModal;
+    abrirModal=function(){ var r=_abrirModal.apply(this,arguments); rotaAbrir("modal"); return r; };
+  }
+  if(typeof fecharModal==="function"){
+    var _fecharModal=fecharModal;
+    fecharModal=function(){ var r=_fecharModal.apply(this,arguments); rotaFechar("modal"); return r; };
+  }
+  if(typeof vsAbrir==="function"){
+    var _vsAbrir=vsAbrir;
+    vsAbrir=function(){ var r=_vsAbrir.apply(this,arguments); rotaAbrir("visor"); return r; };
+  }
+  if(typeof vsFechar==="function"){
+    var _vsFechar=vsFechar;
+    vsFechar=function(){ var r=_vsFechar.apply(this,arguments); rotaFechar("visor"); return r; };
+  }
+
+  // ---------- 2. link profundo ----------
+  function codigoDaFicha(){
+    var c=S.fichaAberta?achaCode(S.fichaAberta):null;
+    return c||null;
+  }
+  function urlBase(){ return location.origin+location.pathname; }
+  function urlDaFicha(){
+    var c=codigoDaFicha(); if(!c) return;
+    var u=urlBase()+"?cod="+encodeURIComponent(c[F.BANCO]+":"+c[F.COD]);
+    try{ history.replaceState(history.state,"",u); }catch(_e){}
+  }
+  function urlLimpa(){
+    if(location.search.indexOf("cod=")<0) return;
+    try{ history.replaceState(history.state,"",urlBase()); }catch(_e){}
+  }
+  function abrirPorParametro(){
+    // atalho do manifesto (A4): ./?acervo=1 abre o acervo de documentos direto
+    if(/[?&]acervo=1(&|$)/.test(location.search)){ var ba=$("btn-acervo"); if(ba){ ba.click(); } }
+    var m=/[?&]cod=([^&]+)/.exec(location.search); if(!m) return false;
+    var par=decodeURIComponent(m[1]), i=par.indexOf(":"); if(i<0) return false;
+    var banco=par.slice(0,i).toUpperCase(), cod=par.slice(i+1);
+    var chave=null;
+    try{ chave=chavePorCod(banco,cod); }catch(_e){}
+    if(!chave){ toast("Código "+banco+" "+cod+" não está no acervo"); return false; }
+    var inp=$("busca"); if(inp) inp.value=cod;
+    S.termo=cod; S.modoEap=false; S.escolhas=[]; S.abertaLinha=-1;
+    if(typeof zerarFiltrosDaBusca==="function") zerarFiltrosDaBusca();
+    invalida(); render();
+    S.fichaAberta=chave; renderFichaLateral();
+    M.abertoPorLink=chave;
+    return true;
+  }
+
+  // ---------- 3. compartilhar ----------
+  function textoDaFicha(c){
+    var r=pvDe(c), sel=pvSel(c[F.BANCO]);
+    var l1=c[F.BANCO]+" "+c[F.COD]+" · "+c[F.DESC]+(c[F.UNI]?" ("+c[F.UNI]+")":"");
+    var l2;
+    if(r.est==="OK"){
+      l2="R$ "+pvFmt(r.on,r.esc)+" onerado"+(r.des!=null?" · R$ "+pvFmt(r.des,r.esc)+" desonerado":"")+
+         (sel?" · "+(sel.loc||"")+" · "+(sel.ed||""):"");
+    } else { l2="preço: "+r.est; }
+    return l1+"\n"+l2;
+  }
+  function compartilhar(){
+    var c=codigoDaFicha(); if(!c){ toast("Abra um código para compartilhar"); return; }
+    var url=urlBase()+"?cod="+encodeURIComponent(c[F.BANCO]+":"+c[F.COD]);
+    var texto=textoDaFicha(c);
+    M.ultimoShare={title:"Códice · "+c[F.BANCO]+" "+c[F.COD],text:texto,url:url};
+    if(navigator.share){
+      navigator.share(M.ultimoShare).then(function(){ toast("Compartilhado"); })
+        .catch(function(e){ if(!/abort/i.test(String(e))) copiar(texto+"\n"+url); });
+    } else { copiar(texto+"\n"+url); }
+  }
+  function copiarLink(){
+    var c=codigoDaFicha(); if(!c){ toast("Abra um código para copiar o link"); return; }
+    copiar(urlBase()+"?cod="+encodeURIComponent(c[F.BANCO]+":"+c[F.COD]));
+  }
+  function copiar(t){
+    var fim=function(){ toast("Copiado para a área de transferência"); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(fim,function(){ copiarLegado(t); fim(); }); }
+    else { copiarLegado(t); fim(); }
+  }
+  function copiarLegado(t){
+    var ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(_e){} document.body.removeChild(ta);
+  }
+  M.compartilhar=compartilhar; M.copiarLink=copiarLink; M.textoDaFicha=textoDaFicha;
+
+  // ---------- 4. UI de celular ----------
+  var _toastT=null;
+  function toast(msg){
+    var t=$("m-toast"); if(!t){ t=document.createElement("div"); t.id="m-toast"; document.body.appendChild(t); }
+    t.textContent=msg; t.classList.add("on"); clearTimeout(_toastT);
+    _toastT=setTimeout(function(){ t.classList.remove("on"); },2600);
+  }
+  M.toast=toast;
+  var ICONES={
+    buscar:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
+    filtros:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+    acervo:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h8"/></svg>',
+    mais:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+    comparar:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h7v12H4zM13 6h7v12h-7z"/></svg>',
+    excel:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/></svg>',
+    comp:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15V9M12 15V7M16 15v-4"/></svg>',
+    play:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>',
+    base:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>',
+    sobre:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>',
+    share:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>'
+  };
+  function esc_(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+  function montarUI(){
+    if($("m-nav")) return;
+    var nav=document.createElement("div"); nav.id="m-nav";
+    nav.innerHTML=
+      '<button data-m-nav="buscar" class="on"><span class="ic">'+ICONES.buscar+'</span>Buscar</button>'+
+      '<button data-m-nav="filtros"><span class="ic">'+ICONES.filtros+'</span>Filtros</button>'+
+      '<button data-m-nav="acervo"><span class="ic">'+ICONES.acervo+'</span>Acervo</button>'+
+      '<button data-m-nav="mais"><span class="ic">'+ICONES.mais+'</span>Mais</button>';
+    document.body.appendChild(nav);
+    var veu=document.createElement("div"); veu.id="m-mais-veu"; document.body.appendChild(veu);
+    var mais=document.createElement("div"); mais.id="m-mais"; document.body.appendChild(mais);
+    veu.addEventListener("click",maisFechar);
+    nav.addEventListener("click",function(ev){
+      var b=ev.target.closest("[data-m-nav]"); if(!b) return;
+      var q=b.getAttribute("data-m-nav");
+      if(q==="buscar"){ fecharTudo(); var i=$("busca"); if(i){ i.focus(); } window.scrollTo(0,0); }
+      else if(q==="filtros"){ filtrosToggle(); }
+      else if(q==="acervo"){ fecharTudo(); var a=$("btn-acervo"); if(a) a.click(); }
+      else if(q==="mais"){ if($("m-mais").classList.contains("on")) maisFechar(); else maisAbrir(); }
+      navAtivo();
+    });
+    document.addEventListener("click",function(ev){
+      // véu da folha de filtros: clique fora fecha (o ::after não recebe clique; usa a área do #app).
+      // O handler de captura do template ([data-gaveta]) roda ANTES deste, abre a gaveta e re-renderiza a
+      // coluna: o ev.target chega DESANEXADO e closest("#lista-ctrl") devolve nulo (medido 17/09 — fechava a
+      // folha no toque do cartão). Clique já consumido pelo template não é "fora"; alvo desanexado se
+      // resolve pela POSIÇÃO do toque.
+      if(ev.cancelBubble) return;
+      var app=$("app");
+      if(!app||!app.classList.contains("m-filtros")) return;
+      var alvo=ev.target&&ev.target.isConnected?ev.target:document.elementFromPoint(ev.clientX||0,ev.clientY||0);
+      if(!alvo||!alvo.closest) return;
+      if(!alvo.closest("#lista-ctrl")&&!alvo.closest("#gaveta-filtros")&&!alvo.closest("#m-nav")){
+        filtrosFechar(); ev.stopPropagation();
+      }
+    },true);
+  }
+  function navAtivo(){
+    var nav=$("m-nav"); if(!nav) return;
+    var app=$("app");
+    var ativo="buscar";
+    if(app&&app.classList.contains("m-filtros")) ativo="filtros";
+    if($("m-mais")&&$("m-mais").classList.contains("on")) ativo="mais";
+    nav.querySelectorAll("[data-m-nav]").forEach(function(b){ b.classList.toggle("on",b.getAttribute("data-m-nav")===ativo); });
+    var nc=$("n-comparar"), bc=nav.querySelector('[data-m-nav="mais"]');
+    if(bc){ var n=nc?parseInt(nc.textContent,10)||0:0; var tag=bc.querySelector(".n");
+      if(n>0){ if(!tag){ tag=document.createElement("span"); tag.className="n"; bc.appendChild(tag); } tag.textContent=String(n); }
+      else if(tag){ tag.remove(); } }
+  }
+  function fecharTudo(){
+    filtrosFechar(); maisFechar();
+    if(S.fichaAberta){ S.fichaAberta=""; renderFichaLateral(); }
+  }
+  function filtrosToggle(){ var app=$("app"); if(app.classList.contains("m-filtros")) filtrosFechar(); else filtrosAbrir(); }
+  function filtrosAbrir(){ maisFechar(); $("app").classList.add("m-filtros"); rotaAbrir("filtros"); navAtivo(); }
+  function filtrosFechar(){
+    var app=$("app"); if(!app.classList.contains("m-filtros")) return;
+    if(typeof GAVETA!=="undefined"&&GAVETA){ GAVETA=null; repintarCtrl(); }
+    app.classList.remove("m-filtros"); rotaFechar("filtros"); navAtivo();
+  }
+  function maisAbrir(){
+    filtrosFechar();
+    var m=$("m-mais"); if(!m) return;
+    var ba=$("btn-analitica"), nc=$("n-comparar"), ne=$("n-excel");
+    var https=location.protocol==="https:";
+    var fb=$("faixa-base"); var bases=fb?fb.textContent.replace(/\s+/g," ").trim():"";
+    m.innerHTML='<div class="alca"></div>'+
+      '<button class="it" data-m-mais="comparar">'+ICONES.comparar+'<span>Comparar<span class="sub">'+esc_((nc?nc.textContent:"0"))+' código(s) marcado(s) · até 3</span></span></button>'+
+      '<button class="it" data-m-mais="excel">'+ICONES.excel+'<span>Exportar Excel<span class="sub">'+esc_((ne?ne.textContent:"0"))+' selecionado(s) · preço nos dois regimes</span></span></button>'+
+      '<button class="it" data-m-mais="analitica"'+(ba&&!ba.hidden?"":" hidden")+'>'+ICONES.comp+'<span>Composição analítica<span class="sub">memória de cálculo pela metodologia do banco</span></span></button>'+
+      '<button class="it" data-m-mais="copiar"'+(S.fichaAberta?"":" hidden")+'>'+ICONES.share+'<span>Copiar link do código<span class="sub">abre a ficha direto em qualquer aparelho</span></span></button>'+
+      '<button class="it" data-m-mais="instalar"'+(M.instalar&&!M.app?"":" hidden")+'>'+ICONES.play+'<span>Instalar o app<span class="sub">ícone na tela inicial · funciona sem internet</span></span></button>'+
+      '<button class="it" data-m-mais="bases">'+ICONES.base+'<span>Data-base dos bancos<span class="sub">'+esc_(bases||"nenhum banco ligado")+'</span></span></button>'+
+      '<button class="it" data-m-mais="sobre"'+(https?"":" hidden")+'>'+ICONES.sobre+'<span>Sobre e privacidade<span class="sub">sem cadastro, sem coleta de dados</span></span></button>';
+    m.classList.add("on"); $("m-mais-veu").classList.add("on"); rotaAbrir("mais"); navAtivo();
+    m.onclick=function(ev){
+      var b=ev.target.closest("[data-m-mais]"); if(!b) return;
+      var q=b.getAttribute("data-m-mais");
+      if(q==="comparar"){ maisFechar(); var x=$("btn-comparar"); if(x) x.click(); }
+      else if(q==="excel"){ maisFechar(); var y=$("btn-excel"); if(y) y.click(); }
+      else if(q==="analitica"){ maisFechar(); if(ba) ba.click(); }
+      else if(q==="copiar"){ maisFechar(); copiarLink(); }
+      else if(q==="instalar"){ maisFechar(); if(M.instalar){ M.instalar.prompt(); M.instalar.userChoice.then(function(){ M.instalar=null; }); } }
+      else if(q==="bases"){ copiar(bases); }
+      else if(q==="sobre"){ maisFechar(); window.open("vitrine/","_blank"); }
+    };
+  }
+  function maisFechar(){
+    var m=$("m-mais"); if(!m||!m.classList.contains("on")) return;
+    m.classList.remove("on"); $("m-mais-veu").classList.remove("on"); rotaFechar("mais"); navAtivo();
+  }
+  function fichaAcoes(){
+    if(!celular()) return;
+    var w=$("lista-ficha"); if(!w||!S.fichaAberta||w.querySelector(".m-ficha-acoes")) return;
+    var bar=document.createElement("div"); bar.className="m-ficha-acoes";
+    bar.innerHTML='<button data-m-ficha="share">'+ICONES.share+'Compartilhar</button>'+
+                  '<button data-m-ficha="completa">Ficha completa</button>'+
+                  '<button data-m-ficha="comparar" class="cheio">Comparar</button>';
+    bar.addEventListener("click",function(ev){
+      var b=ev.target.closest("[data-m-ficha]"); if(!b) return;
+      var q=b.getAttribute("data-m-ficha");
+      if(q==="share") compartilhar();
+      else if(q==="completa"&&typeof abrirFicha==="function") abrirFicha(S.fichaAberta);
+      else if(q==="comparar"&&typeof addComparar==="function"){ addComparar(S.fichaAberta); toast("Marcado para comparar"); navAtivo(); }
+      ev.stopPropagation();
+    });
+    w.appendChild(bar);
+  }
+  M.filtrosAbrir=filtrosAbrir; M.filtrosFechar=filtrosFechar; M.maisAbrir=maisAbrir; M.maisFechar=maisFechar;
+
+  // ---------- 5. faixa de bancos/data-bases RETRÁTIL (pedido dele, 17/09/2026 00:0x: "a lista de bancos
+  // selecionados ocupa muito espaço da tela") — vale em qualquer largura. Recolhida por padrão: uma linha
+  // "N bancos · data-bases ▸"; o clique abre a lista; estado em localStorage codice.faixa. A contagem de
+  // códigos (.dir) continua visível. ----------
+  function faixaRetratil(){
+    var fb=$("faixa-base"); if(!fb||fb.querySelector(".fb-tog")) return;
+    var itens=fb.querySelectorAll(":scope > div[data-bases]"); var n=itens.length; if(!n) return;
+    var aberta=false; try{ aberta=localStorage.getItem("codice.faixa")==="aberta"; }catch(_e){}
+    fb.classList.toggle("fb-recolhida",!aberta);
+    var tog=document.createElement("div"); tog.className="fb-tog"; tog.setAttribute("data-fb-tog","1");
+    tog.title=aberta?"Recolher a lista de bancos":"Mostrar a data-base de cada banco";
+    tog.innerHTML='<span class="fb-seta"></span><b>'+n+'</b>&nbsp;banco'+(n>1?'s':'')+' · data-bases';
+    fb.insertBefore(tog,fb.firstChild);
+  }
+  if(typeof renderFaixaBase==="function"){
+    var _renderFaixaBase=renderFaixaBase;
+    renderFaixaBase=function(){ var r=_renderFaixaBase.apply(this,arguments); faixaRetratil(); return r; };
+  }
+  document.addEventListener("click",function(ev){
+    var tg=ev.target&&ev.target.closest&&ev.target.closest("[data-fb-tog]"); if(!tg) return;
+    var fb=$("faixa-base"); var rec=fb.classList.toggle("fb-recolhida");
+    try{ localStorage.setItem("codice.faixa",rec?"recolhida":"aberta"); }catch(_e){}
+    tg.title=rec?"Mostrar a data-base de cada banco":"Recolher a lista de bancos";
+    ev.stopPropagation();
+  });
+  M.faixaRetratil=faixaRetratil;
+
+  window.addEventListener("beforeinstallprompt",function(e){ e.preventDefault(); M.instalar=e; });
+  function ligar(){
+    if(celular()) montarUI();
+  }
+  if(MQ.addEventListener) MQ.addEventListener("change",ligar); else if(MQ.addListener) MQ.addListener(ligar);
+
+  // espera o boot do template (body[data-pronto="1"]) — link profundo só com o catálogo carregado
+  var _esp=setInterval(function(){
+    if(document.body.dataset.pronto!=="1") return;
+    clearInterval(_esp); M.pronto=true; ligar(); faixaRetratil();
+    try{ abrirPorParametro(); }catch(e){ toast("Link não pôde abrir a ficha: "+String(e&&e.message||e)); }
+    navAtivo();
+  },120);
+})();
+
+</script>
+
 <script id="pwa-camada">
 /* Camada PWA — injetada por publicar_pages.py SOMENTE na copia hospedada.
    O arquivo local (Desktop/MOVE) nao a carrega: service worker nao existe em file://. */

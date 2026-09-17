@@ -1,13 +1,25 @@
 {
-  "name": "Códice — Buscador de Bancos",
+  "id": "./",
+  "name": "Códice — critério, escopo e preço nos 13 bancos oficiais",
   "short_name": "Códice",
-  "description": "Busca de codigos, criterios e precos SINAPI / SICRO / SICOR / SUDECAP",
+  "description": "Buscador de códigos de composição e insumo nos 13 bancos oficiais de custo de obra pública (SINAPI, SICRO, SICOR/SETOP, SUDECAP e alternativos): critério de medição com a página do caderno, escopo declarado (inclui/exclui), apropriação por faixa, projeto-tipo, composição analítica com memória de cálculo e preço onerado/desonerado por localidade e data-base. Funciona sem internet depois da primeira carga; sem cadastro, sem coleta de dados.",
   "lang": "pt-BR",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait",
   "background_color": "#f1f4f8",
   "theme_color": "#0b2a4a",
+  "categories": [
+    "productivity",
+    "business",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "icone-192.png",
@@ -24,6 +36,46 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Buscar código",
+      "short_name": "Buscar",
+      "url": "./",
+      "icons": [
+        {
+          "src": "icone-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Acervo de documentos",
+      "short_name": "Acervo",
+      "url": "./?acervo=1",
+      "icons": [
+        {
+          "src": "icone-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/codice-busca.png",
+      "sizes": "824x1830",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Busca com preço nos dois regimes"
+    },
+    {
+      "src": "screenshots/codice-ficha.png",
+      "sizes": "824x1830",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ficha do código: critério, escopo e preço"
     }
   ]
 }
