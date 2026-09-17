@@ -5638,7 +5638,15 @@ if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
     if (pwaOciosa()) { location.reload(); } else { pwaAvisar(); }
   });
   addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').catch(function (e) { console.error('SW:', e); });
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      /* 17/09/2026 — no app (TWA) a instancia fica viva/suspensa por dias e o navegador so confere um
+         sw.js novo em navegacao ou a cada 24 h: ele abriu o app instalado e viu o build ANTERIOR (layout
+         desktop) horas depois da publicacao. Ao voltar ao primeiro plano, pede a verificacao; o
+         controllerchange acima faz o resto (reload com a tela ociosa, aviso com trabalho em curso). */
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') { reg.update().catch(function () {}); }
+      });
+    }).catch(function (e) { console.error('SW:', e); });
   });
 }
 </script>
