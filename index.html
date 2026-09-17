@@ -5187,7 +5187,7 @@ function fechamentoCensoInterno(){
 
   /* filtros F3 = folha de baixo, aberta pela barra inferior (classe m-filtros no #app) */
   #lista-ctrl{display:none!important}
-  #app.m-filtros #lista-ctrl{display:flex!important;position:fixed;left:0;right:0;bottom:72px;top:auto;height:calc(72vh / var(--m-esc));z-index:60;
+  #app.m-filtros #lista-ctrl{display:flex!important;position:fixed;left:0;right:0;bottom:72px;top:auto;height:auto;max-height:calc(72vh / var(--m-esc));z-index:60;
     margin:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(11,42,74,.28);padding:14px 16px 16px;overflow:auto}
   #app.m-filtros::after{content:"";position:fixed;inset:0;background:rgba(11,42,74,.35);z-index:59}
   #filtros-cab .seta{display:none}
@@ -5195,10 +5195,34 @@ function fechamentoCensoInterno(){
   #lista-ctrl .rs{min-height:56px;padding:10px 4px}
   #lista-ctrl .rs .t{font-size:12px}
   #lista-ctrl .rs .v{font-size:15px}
+  /* a gaveta ABRAÇA o conteúdo (auditoria visual 17/09: Regime/Ordem abriam 80 % de tela vazia); o teto continua 80 vh ÷ escala */
   #gaveta-filtros{left:0!important;right:0!important;width:auto!important;max-width:none!important;top:auto!important;bottom:72px!important;
-    height:calc(80vh / var(--m-esc))!important;border-radius:22px 22px 0 0!important;z-index:61}
+    height:auto!important;max-height:calc(80vh / var(--m-esc))!important;border-radius:22px 22px 0 0!important;z-index:61}
   #gaveta-filtros .gv-ok{min-height:48px;display:inline-flex;align-items:center;padding:0 18px;font-size:14px;font-weight:700;border-radius:10px;background:var(--laranja);color:#fff}
   #gaveta-filtros .gv-x{width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center}
+  #gaveta-filtros .gv-cab .acoes{font-size:14px;gap:10px;flex-wrap:wrap}
+  #gaveta-filtros .gv-nota{font-size:13px}
+  /* gaveta BANCOS (auditoria visual 17/09, 412 px): a linha do banco era uma grade de 5 colunas medida para 700 px —
+     nome truncado, "27 LOCALIDADES" por cima do número, selects de 10,5 px. No celular vira cartão de 2 linhas:
+     [ ] NOME localidades/bases · CÓDIGOS  /  [localidade ▾] [data-base ▾]. O cabeçalho de colunas sai. */
+  #gaveta-filtros .gv-selcab{display:none!important}
+  #gaveta-filtros [data-selb]{grid-template-columns:28px minmax(0,1fr) auto!important;column-gap:8px!important;row-gap:8px!important;padding:10px 12px!important}
+  #gaveta-filtros [data-selb] > div:nth-child(2){flex-wrap:wrap;row-gap:2px}
+  #gaveta-filtros [data-selb] > div:nth-child(2) > span:nth-child(2){font-size:15px!important;white-space:normal!important;overflow:visible!important}
+  #gaveta-filtros [data-selb] > div:nth-child(2) > span.mono{font-size:11px!important}
+  #gaveta-filtros [data-selb] > div.mono:nth-child(3){font-size:14px!important;align-self:center}
+  #gaveta-filtros [data-selb] > div[data-pv-stop]{grid-row:2}
+  #gaveta-filtros [data-selb] > div[data-pv-stop]:nth-child(4){grid-column:2}
+  #gaveta-filtros [data-selb] > div[data-pv-stop]:nth-child(5){grid-column:3}
+  #gaveta-filtros [data-selb] select{width:100%;min-width:96px;height:40px;font-size:14px!important;padding:6px 8px!important;border-radius:8px}
+  #gaveta-filtros [data-selb] [data-pv-stop]>div{padding:8px 10px!important;font-size:13px!important}
+  #gaveta-filtros .segbt{min-height:44px;display:flex;align-items:center;justify-content:center;font-size:13px}
+  #gaveta-filtros .gv-prio label{font-size:12px}
+  /* painel suspenso das facetas (chips sob a busca): 262 px e linhas de 11 px eram de desktop */
+  .fpainel{position:fixed;left:16px;right:16px;top:auto;min-width:0;max-height:calc(60vh / var(--m-esc));z-index:57;border-radius:12px;box-shadow:0 12px 32px rgba(11,42,74,.25)}
+  .fpainel .top{padding:10px 14px} .fpainel .top .c,.fpainel .top .l{font-size:12px}
+  .fv{min-height:48px;padding:8px 14px} .fv .tx{font-size:14px} .fv .n{font-size:12px} .fv .bx{width:20px;height:20px}
+  .fcab{min-height:44px} .fcab .bd{font-size:11px}
 
   /* lista compacta (M2): 2 linhas por código, código + preço na 1ª, descrição em 1 linha na 2ª */
   #lista-wrap{margin:8px 0 0;border-radius:0;box-shadow:none;background:transparent}
@@ -5219,7 +5243,7 @@ function fechamentoCensoInterno(){
   #tab-lista td:nth-child(4){order:3;font-size:12px;color:var(--apagado)}
   #tab-lista td.pv-val{order:4;margin-left:auto;font-size:14px;font-weight:600;color:var(--texto)}
   #tab-lista td.pv-val.pv-des{margin-left:0;font-weight:400;color:var(--apagado)}
-  #tab-lista .cbanco{font-size:10.5px;padding:2px 6px}
+  #tab-lista .cbanco{font-size:11.5px;padding:2px 7px}
   th.pv-th{width:auto}
 
   /* ficha (M2 folha → M3 tela cheia): a ficha lateral ocupa a tela, com VOLTAR fixo no topo e ações no pé */
@@ -5279,12 +5303,70 @@ function fechamentoCensoInterno(){
   /* modais (ficha completa, comparar, acervo, Excel) em tela cheia */
   .tela-cheia{padding:0;z-index:75}
   .modal{max-width:none;max-height:none;height:100%;border-radius:0}
-  .modal-cab{padding:12px 16px;gap:12px}
-  .modal-cab .fechar{min-height:44px;padding:0 14px}
+  /* cabeçalho dos modais (auditoria visual 17/09): "FECHAR — ESC" estourava a largura no Excel, o código do dossiê
+     quebrava em 2 linhas e os botões empilhavam. Cabeçalho em grade 2 colunas + linha de ações; o botão de fechar
+     vira "Fechar" (tecla ESC não existe no celular). */
+  .modal-cab{padding:12px 16px;gap:10px 12px;flex-wrap:wrap;align-items:center}
+  .modal-cab .t{font-size:15px;flex:1 1 auto}
+  .modal-cab .fechar{min-height:44px;padding:0 16px;font-size:0;border-radius:8px}
+  .modal-cab .fechar::before{content:"Fechar";font-size:13px;font-weight:700;letter-spacing:0}
+  .modal-cab .btn-vazio,.modal-cab .btn-azul{min-height:44px;font-size:12px;padding:0 12px;white-space:nowrap}
+  .modal-cab:has(.mc-cod){display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}
+  .modal-cab:has(.mc-cod) > div:first-child{min-width:0}
+  .modal-cab .mc-cod{font-size:24px;white-space:nowrap}
+  .modal-cab .mc-lab,.modal-cab .mc-sub,.modal-cab .mc-preco .lab{font-size:12px}
+  .modal-cab .mc-preco .von{font-size:20px;white-space:nowrap}
+  .modal-cab .mc-acoes{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;margin:0}
   .sec{padding:12px 16px}
+  .sec .st,.st{font-size:12px}
   .fabas{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:6px 16px}
-  .fabas .faba{padding:8px 0;font-size:14px}
+  .fabas .faba{padding:12px 0;font-size:14px;min-height:44px;display:flex;align-items:center}
   .fabas .freg{margin-left:auto;display:flex;align-items:center;gap:6px}
+  .fabas .freg .rchip{padding:8px 10px;font-size:12px}
+  /* tabelas largas dos modais (Excel, Comparar, alertas): rolagem horizontal em vez de coluna espremida */
+  .modal .sec:has(> table.tab-ana),.modal .sec:has(> table.alt-tab){overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.tab-ana td,table.tab-ana th{font-size:13px;padding:8px 10px;vertical-align:top}
+  table.tab-ana td.mono{font-size:12px!important}
+  table.tab-ana:not(:has(th[style*="width:170px"])){min-width:900px}
+  table.tab-ana:has(th[style*="width:170px"]) th:first-child{width:120px!important}
+  table.alt-tab{min-width:700px}
+  /* piso tipográfico do celular: rótulos mono de 8–11 px do desktop sobem para 11–12 px */
+  /* rótulos com font-size INLINE abaixo de 12 px (o template tem dezenas: "DESTE RESULTADO", "2 EM COMPARAÇÃO", eixos do
+     dossiê, cabeçalhos de grupo da gaveta) sobem para 12 px — regra cega por atributo, só dentro desta media query */
+  [style*="font-size:8"]:not(sup),[style*="font-size:9"]:not(sup),[style*="font-size:10"]:not(sup),[style*="font-size:11"]:not(sup),[style*="font-size:11.5"]:not(sup){font-size:12px!important}
+  #lista-ctrl .rs .d,#lista-ctrl .rs .ed{font-size:12px}
+  .bq,.bq .d,#gaveta-filtros .bq{font-size:12px}
+  sup.mono{font-size:10px!important}
+  .tag-mono{font-size:11px!important}
+  .cbanco,.fcomp .nat{font-size:11px}
+  .mc-lab,.mc-sub{font-size:12px}
+  .vazio{padding:48px 24px}
+  .vazio .t{font-size:18px}
+  .vazio .s{font-size:14px;line-height:1.5;text-transform:none;letter-spacing:0}
+  /* rodapé da ficha lateral: Ficha completa e Comparar já estão na barra fixa — ficam Salvar PDF e + Excel, em 44 px */
+  .fic-pe{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 16px}
+  .fic-pe .fic-bt{min-height:44px;display:inline-flex;align-items:center;padding:0 16px;font-size:14px;border-radius:10px}
+  .fic-pe .fic-bt[data-fic-completa],.fic-pe .fic-bt[data-fic-comparar]{display:none}
+  .fc-cod{display:inline-block;padding:6px 0;font-size:14px}
+  /* visor de prancha (auditoria visual 17/09, 412 px): cabeçalho tomava meia tela com a descrição numa coluna estreita,
+     ferramentas de 30 px e a ficha vazando por trás. Cabeçalho em 2 linhas, fundo opaco, ferramentas de 44 px. */
+  #visor{padding:0;z-index:78;background:#0a1a21}
+  #vs-topo{flex-wrap:wrap;gap:8px;padding:10px 12px}
+  #vs-topo .vs-id{flex:1 1 100%;min-width:0}
+  #vs-topo .vs-cod{font-size:15px}
+  #vs-topo .vs-desc{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .vs-ferramentas{margin-left:0;width:100%;justify-content:space-between}
+  .vs-conta{padding:0 8px 0 0;font-size:12px}
+  .vs-bt{min-height:44px;min-width:44px;padding:8px 12px;font-size:16px}
+  .vs-nivel{font-size:13px}
+  .vs-fechar{margin-left:auto}
+  #vs-palco{padding:8px}
+  #vs-pe{padding:10px 12px;gap:8px 12px}
+  .vs-leg,.vs-fonte{font-size:12px}
+  .vs-abrir{margin-left:0;flex:1 1 100%;display:flex;gap:8px}
+  .vs-abrir a{flex:1;text-align:center;padding:12px;font-size:12px}
+  #vs-pdf{min-height:44px;font-size:12px}
+  #vs-dica{display:none}
 
   /* rodapé vira linha discreta acima da barra */
   #rodape{margin:0;padding:6px 16px;font-size:12px;flex-wrap:wrap;gap:8px}
@@ -5314,13 +5396,21 @@ function fechamentoCensoInterno(){
   #m-mais-veu{position:fixed;inset:0;background:rgba(11,42,74,.35);z-index:61;display:none}
   #m-mais-veu.on{display:block}
 
+  /* acervo de celular: busca + lista de documentos por pasta (cada linha ≥ 56 px, abre o documento público) */
+  .m-acv-busca{position:sticky;top:0;z-index:2;background:#fff;padding:10px 16px;border-bottom:1px solid var(--fioc)}
+  .m-acv-busca input{width:100%;height:44px;border:1px solid var(--cbd);border-radius:22px;padding:0 16px;font-size:16px;font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;box-sizing:border-box}
+  .m-acv-pasta{padding:14px 16px 6px;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--apagado);text-transform:uppercase;background:var(--fundo)}
+  .m-acv-doc{display:flex;flex-direction:column;justify-content:center;min-height:56px;padding:8px 16px;border-bottom:1px solid var(--fioc);text-decoration:none;color:var(--texto);background:#fff}
+  .m-acv-doc .nm{font-size:14px;font-weight:600;line-height:1.3}
+  .m-acv-doc .sub{font-size:12px;color:var(--apagado);font-family:"IBM Plex Mono",monospace;margin-top:2px;word-break:break-all}
+  .m-acv-vazio{padding:32px 16px;text-align:center;color:var(--apagado);font-size:14px}
+  .m-acv-n{padding:14px 16px 24px;text-align:center;font-size:12px;color:var(--apagado)}
+
   /* aviso curto (toast) */
   #m-toast{position:fixed;left:16px;right:16px;bottom:88px;z-index:80;background:var(--marinho);color:#fff;border-radius:10px;padding:12px 14px;
     font-size:14px;display:none;box-shadow:0 8px 24px rgba(11,42,74,.3)}
   #m-toast.on{display:block}
 
-  /* visor de prancha e dossiê ganham o espaço todo */
-  #visor{padding:0;z-index:78}
 }
 
 </style>
@@ -5425,7 +5515,7 @@ function fechamentoCensoInterno(){
   }
   function abrirPorParametro(){
     // atalho do manifesto (A4): ./?acervo=1 abre o acervo de documentos direto
-    if(/[?&]acervo=1(&|$)/.test(location.search)){ var ba=$("btn-acervo"); if(ba){ ba.click(); } }
+    if(/[?&]acervo=1(&|$)/.test(location.search)){ if(!(celular()&&acervoCelular())){ var ba=$("btn-acervo"); if(ba){ ba.click(); } } }
     var m=/[?&]cod=([^&]+)/.exec(location.search); if(!m) return false;
     var par=decodeURIComponent(m[1]), i=par.indexOf(":"); if(i<0) return false;
     var banco=par.slice(0,i).toUpperCase(), cod=par.slice(i+1);
@@ -5517,7 +5607,7 @@ function fechamentoCensoInterno(){
       var q=b.getAttribute("data-m-nav");
       if(q==="buscar"){ fecharTudo(); var i=$("busca"); if(i){ i.focus(); } window.scrollTo(0,0); }
       else if(q==="filtros"){ filtrosToggle(); }
-      else if(q==="acervo"){ fecharTudo(); var a=$("btn-acervo"); if(a) a.click(); }
+      else if(q==="acervo"){ fecharTudo(); if(!acervoCelular()){ var a=$("btn-acervo"); if(a) a.click(); } }
       else if(q==="mais"){ if($("m-mais").classList.contains("on")) maisFechar(); else maisAbrir(); }
       navAtivo();
     });
@@ -5565,17 +5655,20 @@ function fechamentoCensoInterno(){
     var m=$("m-mais"); if(!m) return;
     var ba=$("btn-analitica"), nc=$("n-comparar"), ne=$("n-excel");
     var https=location.protocol==="https:";
-    var fb=$("faixa-base"); var bases=fb?fb.textContent.replace(/\s+/g," ").trim():"";
+    // data-bases: um item por banco ligado (auditoria visual 17/09: o textContent inteiro da faixa saía colado —
+    // "13 bancos · data-basesAGESUL_MS 2026-01 MSDER_ES..."); o toque abre a gaveta Bancos, onde se muda a data-base
+    var fb=$("faixa-base"); var itens=fb?Array.prototype.map.call(fb.querySelectorAll("div[data-bases]"),function(d){ return d.textContent.replace(/\s+/g," ").trim(); }).filter(Boolean):[];
+    var bases=itens.length?(itens.slice(0,4).join(" · ")+(itens.length>4?" · +"+(itens.length-4):"")):"";
     m.innerHTML='<div class="alca"></div>'+
       '<button class="it" data-m-mais="comparar">'+ICONES.comparar+'<span>Comparar<span class="sub">'+esc_((nc?nc.textContent:"0"))+' código(s) marcado(s) · até 3</span></span></button>'+
       '<button class="it" data-m-mais="excel">'+ICONES.excel+'<span>Exportar Excel<span class="sub">'+esc_((ne?ne.textContent:"0"))+' selecionado(s) · preço nos dois regimes</span></span></button>'+
-      '<button class="it" data-m-mais="analitica">'+ICONES.comp+'<span>Composição analítica<span class="sub">'+(ba&&!ba.hidden?"memória de cálculo pela metodologia do banco":"abra um código: a composição fica na barra da ficha")+'</span></span></button>'+
+      '<button class="it" data-m-mais="analitica">'+ICONES.comp+'<span>Composição analítica<span class="sub">'+(ba&&!ba.hidden?"memória de cálculo pela metodologia do banco":"toque num código: a composição abre dentro da ficha")+'</span></span></button>'+
       '<button class="it" data-m-mais="copiar"'+(S.fichaAberta?"":" hidden")+'>'+ICONES.share+'<span>Copiar link do código<span class="sub">abre a ficha direto em qualquer aparelho</span></span></button>'+
       '<button class="it" data-m-mais="instalar"'+(M.instalar&&!M.app?"":" hidden")+'>'+ICONES.play+'<span>Instalar o app<span class="sub">ícone na tela inicial · funciona sem internet</span></span></button>'+
       '<div class="it" data-m-mais="tamanho" style="cursor:default"><span style="font-weight:700;font-size:18px;color:var(--azulb)">Aa</span><span style="flex:1">Tamanho do texto<span class="sub">ajuste para a sua tela · '+Math.round(ajusteDele()*100)+'%</span></span>'+
       '<button type="button" data-m-esc="-1" style="width:48px;height:44px;border:1px solid var(--cbd);border-radius:10px;background:#fff;font-size:18px;font-weight:700">A−</button>'+
       '<button type="button" data-m-esc="1" style="width:48px;height:44px;border:1px solid var(--cbd);border-radius:10px;background:#fff;font-size:20px;font-weight:700;margin-left:6px">A+</button></div>'+
-      '<button class="it" data-m-mais="bases">'+ICONES.base+'<span>Data-base dos bancos<span class="sub">'+esc_(bases||"nenhum banco ligado")+'</span></span></button>'+
+      '<button class="it" data-m-mais="bases">'+ICONES.base+'<span>Bancos e data-bases<span class="sub">'+esc_(bases||"nenhum banco ligado")+'</span></span></button>'+
       '<button class="it" data-m-mais="sobre"'+(https?"":" hidden")+'>'+ICONES.sobre+'<span>Sobre e privacidade<span class="sub">sem cadastro, sem coleta de dados</span></span></button>';
     m.classList.add("on"); $("m-mais-veu").classList.add("on"); rotaAbrir("mais"); navAtivo();
     m.onclick=function(ev){
@@ -5588,7 +5681,7 @@ function fechamentoCensoInterno(){
       else if(q==="analitica"){ maisFechar(); if(S.fichaAberta) composicaoMostrar(); else toast("Toque num código da lista: a composição analítica abre dentro da ficha"); }
       else if(q==="copiar"){ maisFechar(); copiarLink(); }
       else if(q==="instalar"){ maisFechar(); if(M.instalar){ M.instalar.prompt(); M.instalar.userChoice.then(function(){ M.instalar=null; }); } }
-      else if(q==="bases"){ copiar(bases); }
+      else if(q==="bases"){ maisFechar(); filtrosAbrir(); if(typeof GAVETA!=="undefined"){ GAVETA="bancos"; repintarCtrl(); } }
       else if(q==="sobre"){ maisFechar(); window.open("vitrine/","_blank"); }
     };
   }
@@ -5653,7 +5746,39 @@ function fechamentoCensoInterno(){
     if(cp&&cp.hidden){ cp.hidden=false; sec.classList.remove("fechada"); try{ localStorage.setItem("codice.comp","aberta"); }catch(_e){} }
     try{ sec.scrollIntoView({behavior:"smooth",block:"start"}); }catch(_e){ sec.scrollIntoView(); }
   }
-  M.filtrosAbrir=filtrosAbrir; M.filtrosFechar=filtrosFechar; M.maisAbrir=maisAbrir; M.maisFechar=maisFechar; M.composicaoMostrar=composicaoMostrar;
+  // ---------- 4c. ACERVO NO CELULAR (auditoria visual 17/09): o modal do template pergunta "onde está a pasta BANCOS
+  // nesta máquina" e mede o disco — não há disco no celular. Aqui o destino Acervo lista os documentos do índice
+  // (PDFS: [caminho, driveId, existeLocal, supersedidoPor]) com busca, agrupados pela pasta de origem, e cada um abre
+  // pela mesma rota pública que a ficha usa (linkDoc). Reaproveita abrirModal (rota VOLTAR, véu, fechar). ----------
+  function nomeDoc(cam){ var n=String(cam).split("/").pop().replace(/\.(pdf|xlsx?|xlsm|csv|docx?)$/i,""); return n.replace(/_/g," "); }
+  function acervoCelular(){
+    if(typeof PDFS==="undefined"||!PDFS||!PDFS.length||typeof abrirModal!=="function"||typeof linkDoc!=="function") return false;
+    var lista=[]; for(var i=0;i<PDFS.length;i++){ var p=PDFS[i]; if(!p||!p[0]||p[3]) continue; var l=linkDoc(i,0); if(!l||!l.url) continue;
+      lista.push({i:i,cam:p[0],nome:nomeDoc(p[0]),pasta:String(p[0]).split("/").slice(0,-1).join(" › ")||"—",url:l.url}); }
+    lista.sort(function(a,b){ return a.pasta===b.pasta?a.nome.localeCompare(b.nome):a.pasta.localeCompare(b.pasta); });
+    function html(filtro){
+      var f=(filtro||"").trim().toLowerCase(), h="", pasta=null, n=0;
+      lista.forEach(function(d){ if(f&&(d.nome+" "+d.pasta).toLowerCase().indexOf(f)<0) return; n++;
+        if(d.pasta!==pasta){ pasta=d.pasta; h+='<div class="m-acv-pasta">'+esc_(pasta)+'</div>'; }
+        h+='<a class="m-acv-doc" href="'+esc_(d.url)+'" target="_blank" rel="noopener"><span class="nm">'+esc_(d.nome)+'</span>'+(/\.pdf$/i.test(d.cam)?"":'<span class="sub">'+esc_(d.cam.split("/").pop())+'</span>')+'</a>'; });
+      return (n?h:'<div class="m-acv-vazio">Nenhum documento casa com "'+esc_(filtro)+'"</div>')+'<div class="m-acv-n">'+n+' de '+lista.length+' documentos</div>';
+    }
+    abrirModal('<div class="modal-cab"><div class="t">ACERVO DE DOCUMENTOS</div><div class="mono" style="font-size:12px;color:#c7d2e0">'+lista.length+' NO SITE PÚBLICO</div>'+
+      '<button class="fechar" data-fechar>FECHAR</button></div>'+
+      '<div class="modal-corpo"><div class="m-acv-busca"><input id="m-acv-in" type="search" placeholder="Caderno, banco, manual…" autocomplete="off"></div>'+
+      '<div id="m-acv-lista">'+html("")+'</div></div>');
+    var inp=$("m-acv-in"), out=$("m-acv-lista"), t=null;
+    if(inp&&out){ inp.addEventListener("input",function(){ clearTimeout(t); t=setTimeout(function(){ out.innerHTML=html(inp.value); },120); }); }
+    return true;
+  }
+  // estado vazio da lista: o texto do template descreve o desktop ("à esquerda, o estado da consulta")
+  if(typeof telaInicialLista==="function"){
+    var _tIL=telaInicialLista;
+    telaInicialLista=function(){ var r=_tIL.apply(this,arguments);
+      if(celular()){ var s=document.querySelector("#lista-wrap .vazio .s"); if(s) s.textContent="Busque pelo nome do serviço, código ou palavra-chave. Bancos, regime e o que entra ficam em Filtros; toque num código para ver preço, critério de medição e composição analítica."; }
+      return r; };
+  }
+  M.filtrosAbrir=filtrosAbrir; M.filtrosFechar=filtrosFechar; M.maisAbrir=maisAbrir; M.maisFechar=maisFechar; M.composicaoMostrar=composicaoMostrar; M.acervoCelular=acervoCelular;
 
   // ---------- 5. faixa de bancos/data-bases RETRÁTIL (pedido dele, 17/09/2026 00:0x: "a lista de bancos
   // selecionados ocupa muito espaço da tela") — vale em qualquer largura. Recolhida por padrão: uma linha
