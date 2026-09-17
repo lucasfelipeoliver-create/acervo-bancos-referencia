@@ -5162,6 +5162,12 @@ function fechamentoCensoInterno(){
      (o layout media 900, o texto 1,9x — precos e barra sumiam pela direita); no Playwright nao reproduz. A escala
      vai para a RAIZ do documento (html{zoom}), onde o motor recalcula innerWidth/vw/vh coerentes — e' a tecnica
      de "enquadrar", nao de ampliar. O fator e' dele: A+/A- no menu Mais, guardado no aparelho (codice.escala). */
+  /* 17/09 09:xx ("a aba filtro ficou cortada"): sob html{zoom:f} a unidade vh continua medindo a tela SEM zoom, e o
+     motor amplia o resultado por f — 72vh saia a 115% da tela a 900 px (medido: folha 2177 px numa tela de 1890).
+     Toda altura em vh desta camada divide por --m-esc. Elementos com inset:0 nao sofrem (ancoram nas duas bordas). */
+  /* Ordem das camadas (medida 17/09, "varios botoes nao funcionam"): os modais do template (.tela-cheia) nascem em
+     z 50 e ficavam ATRAS da ficha em tela cheia (z 70) — Ficha completa e Composicao analitica abriam invisiveis.
+     Aqui: barra inferior 65 (sempre visivel; folhas e menu param em bottom:72px) < ficha 70/71 < modais 75 < visor 78 < toast 80. */
   :root{--m-esc:1}
   html{zoom:var(--m-esc)}
   #app{display:flex!important;flex-direction:column;padding:0;padding-bottom:72px;background:var(--fundo)}
@@ -5181,7 +5187,7 @@ function fechamentoCensoInterno(){
 
   /* filtros F3 = folha de baixo, aberta pela barra inferior (classe m-filtros no #app) */
   #lista-ctrl{display:none!important}
-  #app.m-filtros #lista-ctrl{display:flex!important;position:fixed;left:0;right:0;bottom:0;top:auto;height:72vh;z-index:60;
+  #app.m-filtros #lista-ctrl{display:flex!important;position:fixed;left:0;right:0;bottom:72px;top:auto;height:calc(72vh / var(--m-esc));z-index:60;
     margin:0;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(11,42,74,.28);padding:14px 16px 16px;overflow:auto}
   #app.m-filtros::after{content:"";position:fixed;inset:0;background:rgba(11,42,74,.35);z-index:59}
   #filtros-cab .seta{display:none}
@@ -5189,8 +5195,8 @@ function fechamentoCensoInterno(){
   #lista-ctrl .rs{min-height:56px;padding:10px 4px}
   #lista-ctrl .rs .t{font-size:12px}
   #lista-ctrl .rs .v{font-size:15px}
-  #gaveta-filtros{left:0!important;right:0!important;width:auto!important;max-width:none!important;top:auto!important;bottom:0!important;
-    height:80vh!important;border-radius:22px 22px 0 0!important;z-index:61}
+  #gaveta-filtros{left:0!important;right:0!important;width:auto!important;max-width:none!important;top:auto!important;bottom:72px!important;
+    height:calc(80vh / var(--m-esc))!important;border-radius:22px 22px 0 0!important;z-index:61}
   #gaveta-filtros .gv-ok{min-height:48px;display:inline-flex;align-items:center;padding:0 18px;font-size:14px;font-weight:700;border-radius:10px;background:var(--laranja);color:#fff}
   #gaveta-filtros .gv-x{width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center}
 
@@ -5231,17 +5237,21 @@ function fechamentoCensoInterno(){
   #lista-ficha.on .fic-sec div[style*="font-size:12px"]{font-size:14px!important;line-height:1.4}
   .m-ficha-acoes{position:fixed;left:0;right:0;bottom:0;z-index:71;height:72px;background:#fff;border-top:1px solid var(--fiob);
     display:flex;align-items:center;gap:8px;padding:0 12px;box-sizing:border-box}
-  .m-ficha-acoes button{flex:1;height:48px;border-radius:10px;font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:14px;font-weight:600;
+  .m-ficha-acoes button{flex:1;height:48px;border-radius:10px;font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:13px;font-weight:600;white-space:nowrap;padding:0 6px;
     border:1px solid var(--cbd);background:#fff;color:var(--texto);display:flex;align-items:center;justify-content:center;gap:6px;text-transform:none;letter-spacing:0}
-  .m-ficha-acoes button.cheio{flex:1.3;background:var(--laranja);border-color:var(--laranja);color:#fff;font-family:"Montserrat","Segoe UI",system-ui,sans-serif;font-weight:700}
+  .m-ficha-acoes button.ico{flex:0 0 48px;padding:0}
+  .m-ficha-acoes button svg{width:20px;height:20px;stroke:currentColor;flex-shrink:0}
+  .m-ficha-acoes button.cheio{flex:1.1;background:var(--laranja);border-color:var(--laranja);color:#fff;font-family:"Montserrat","Segoe UI",system-ui,sans-serif;font-weight:700}
 
   /* modais (ficha completa, comparar, acervo, Excel) em tela cheia */
-  .tela-cheia{padding:0}
+  .tela-cheia{padding:0;z-index:75}
   .modal{max-width:none;max-height:none;height:100%;border-radius:0}
   .modal-cab{padding:12px 16px;gap:12px}
   .modal-cab .fechar{min-height:44px;padding:0 14px}
   .sec{padding:12px 16px}
-  .fabas{gap:16px;padding:0 16px;overflow-x:auto}
+  .fabas{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:6px 16px}
+  .fabas .faba{padding:8px 0;font-size:14px}
+  .fabas .freg{margin-left:auto;display:flex;align-items:center;gap:6px}
 
   /* rodapé vira linha discreta acima da barra */
   #rodape{margin:0;padding:6px 16px;font-size:12px;flex-wrap:wrap;gap:8px}
@@ -5249,7 +5259,7 @@ function fechamentoCensoInterno(){
   #faixa-base .fb-tog{min-height:36px}
 
   /* barra inferior (Material 3): 4 destinos, alvo de 48 px, ativo com pílula clara */
-  #m-nav{position:fixed;left:0;right:0;bottom:0;height:72px;z-index:58;background:#fff;border-top:1px solid var(--fiob);
+  #m-nav{position:fixed;left:0;right:0;bottom:0;height:72px;z-index:65;background:#fff;border-top:1px solid var(--fiob);
     display:flex;align-items:center;padding:0 8px;box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom)}
   #m-nav button{flex:1;height:64px;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
     font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:12px;font-weight:600;color:#5f6670;text-transform:none;letter-spacing:0;padding:0}
@@ -5259,8 +5269,8 @@ function fechamentoCensoInterno(){
   #m-nav button .n{position:absolute;margin:-30px 0 0 34px;background:var(--laranja);color:#fff;border-radius:9px;font-size:10px;font-weight:700;padding:1px 5px;font-family:"IBM Plex Mono",monospace}
 
   /* menu Mais (folha de baixo) */
-  #m-mais{position:fixed;left:0;right:0;bottom:0;z-index:62;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(11,42,74,.28);
-    padding:8px 16px 16px;box-sizing:border-box;display:none;flex-direction:column;gap:2px;max-height:85vh;overflow:auto}
+  #m-mais{position:fixed;left:0;right:0;bottom:72px;z-index:62;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(11,42,74,.28);
+    padding:8px 16px 16px;box-sizing:border-box;display:none;flex-direction:column;gap:2px;max-height:calc(85vh / var(--m-esc));overflow:auto}
   #m-mais.on{display:flex}
   #m-mais .alca{width:36px;height:4px;background:#cbd2d9;border-radius:2px;align-self:center;margin-bottom:8px}
   #m-mais .it{min-height:52px;display:flex;align-items:center;gap:14px;border:none;background:transparent;text-align:left;width:100%;padding:0 4px;
@@ -5277,7 +5287,7 @@ function fechamentoCensoInterno(){
   #m-toast.on{display:block}
 
   /* visor de prancha e dossiê ganham o espaço todo */
-  #visor{padding:0}
+  #visor{padding:0;z-index:78}
 }
 
 </style>
@@ -5526,7 +5536,7 @@ function fechamentoCensoInterno(){
     m.innerHTML='<div class="alca"></div>'+
       '<button class="it" data-m-mais="comparar">'+ICONES.comparar+'<span>Comparar<span class="sub">'+esc_((nc?nc.textContent:"0"))+' código(s) marcado(s) · até 3</span></span></button>'+
       '<button class="it" data-m-mais="excel">'+ICONES.excel+'<span>Exportar Excel<span class="sub">'+esc_((ne?ne.textContent:"0"))+' selecionado(s) · preço nos dois regimes</span></span></button>'+
-      '<button class="it" data-m-mais="analitica"'+(ba&&!ba.hidden?"":" hidden")+'>'+ICONES.comp+'<span>Composição analítica<span class="sub">memória de cálculo pela metodologia do banco</span></span></button>'+
+      '<button class="it" data-m-mais="analitica">'+ICONES.comp+'<span>Composição analítica<span class="sub">'+(ba&&!ba.hidden?"memória de cálculo pela metodologia do banco":"abra um código: a composição fica na barra da ficha")+'</span></span></button>'+
       '<button class="it" data-m-mais="copiar"'+(S.fichaAberta?"":" hidden")+'>'+ICONES.share+'<span>Copiar link do código<span class="sub">abre a ficha direto em qualquer aparelho</span></span></button>'+
       '<button class="it" data-m-mais="instalar"'+(M.instalar&&!M.app?"":" hidden")+'>'+ICONES.play+'<span>Instalar o app<span class="sub">ícone na tela inicial · funciona sem internet</span></span></button>'+
       '<div class="it" data-m-mais="tamanho" style="cursor:default"><span style="font-weight:700;font-size:18px;color:var(--azulb)">Aa</span><span style="flex:1">Tamanho do texto<span class="sub">ajuste para a sua tela · '+Math.round(ajusteDele()*100)+'%</span></span>'+
@@ -5542,7 +5552,7 @@ function fechamentoCensoInterno(){
       var q=b.getAttribute("data-m-mais");
       if(q==="comparar"){ maisFechar(); var x=$("btn-comparar"); if(x) x.click(); }
       else if(q==="excel"){ maisFechar(); var y=$("btn-excel"); if(y) y.click(); }
-      else if(q==="analitica"){ maisFechar(); if(ba) ba.click(); }
+      else if(q==="analitica"){ maisFechar(); if(ba&&!ba.hidden&&S.fichaAberta) ba.click(); else toast("Toque num código da lista: a composição analítica fica na barra da ficha"); }
       else if(q==="copiar"){ maisFechar(); copiarLink(); }
       else if(q==="instalar"){ maisFechar(); if(M.instalar){ M.instalar.prompt(); M.instalar.userChoice.then(function(){ M.instalar=null; }); } }
       else if(q==="bases"){ copiar(bases); }
@@ -5557,14 +5567,19 @@ function fechamentoCensoInterno(){
     if(!celular()) return;
     var w=$("lista-ficha"); if(!w||!S.fichaAberta||w.querySelector(".m-ficha-acoes")) return;
     var bar=document.createElement("div"); bar.className="m-ficha-acoes";
-    bar.innerHTML='<button data-m-ficha="share">'+ICONES.share+'Compartilhar</button>'+
+    // 17/09 ("não achei como ver a composição analítica"): no celular a barra inferior fica atrás da ficha em tela
+    // cheia, e o menu Mais não é alcançável com a ficha aberta — a composição entra AQUI, ao lado da ficha completa.
+    // Os dois abrem o mesmo modal do template (aba 1 · ficha; aba 2 · composição), por procuração do #btn-analitica.
+    bar.innerHTML='<button data-m-ficha="share" class="ico" title="Compartilhar" aria-label="Compartilhar">'+ICONES.share+'</button>'+
                   '<button data-m-ficha="completa">Ficha completa</button>'+
+                  '<button data-m-ficha="analitica">'+ICONES.comp+'Composição</button>'+
                   '<button data-m-ficha="comparar" class="cheio">Comparar</button>';
     bar.addEventListener("click",function(ev){
       var b=ev.target.closest("[data-m-ficha]"); if(!b) return;
       var q=b.getAttribute("data-m-ficha");
       if(q==="share") compartilhar();
       else if(q==="completa"&&typeof abrirFicha==="function") abrirFicha(S.fichaAberta);
+      else if(q==="analitica"){ var ba=$("btn-analitica"); if(ba) ba.click(); }
       else if(q==="comparar"&&typeof addComparar==="function"){ addComparar(S.fichaAberta); toast("Marcado para comparar"); navAtivo(); }
       ev.stopPropagation();
     });
