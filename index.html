@@ -6135,7 +6135,160 @@ window.selLinhaHTML = function(b) {
     font-size:14px;display:none;box-shadow:0 8px 24px rgba(11,42,74,.3)}
   #m-toast.on{display:block}
 
+  /* ==========================================================================
+     PORTÃO DE AUTENTICAÇÃO MOBILE (CÓDICE APP) — LAYOUT APROVADO
+     ========================================================================== */
+  #codice-mobile-auth-gate{
+    position:fixed;inset:0;z-index:99999;
+    background:#06111e;
+    background:radial-gradient(circle at 50% 15%, #0f2744 0%, #06111e 85%);
+    color:#f8fafc;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    display:flex;flex-direction:column;
+    transition:opacity .35s ease, transform .35s ease;
+    box-sizing:border-box;
+  }
+  #codice-mobile-auth-gate.desbloqueado{
+    opacity:0;pointer-events:none;transform:scale(.98);
+  }
+  #codice-mobile-auth-gate .bp-grid{
+    position:absolute;pointer-events:none;z-index:1;opacity:.8;
+  }
+  #codice-mobile-auth-gate .bp-top-right{top:-10px;right:-10px;width:240px;height:240px}
+  #codice-mobile-auth-gate .bp-bottom-left{bottom:-10px;left:-10px;width:240px;height:240px}
+
+  .gate-conteudo{
+    position:relative;z-index:2;
+    display:flex;flex-direction:column;align-items:center;
+    width:100%;max-width:420px;
+    margin:auto;padding:24px 18px;
+    box-sizing:border-box;
+  }
+  .gate-marca{text-align:center;margin-bottom:20px}
+  .gate-logo-glow{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:110px;height:110px;margin-bottom:8px;
+    filter:drop-shadow(0 10px 25px rgba(56,189,248,.25));
+  }
+  .gate-logo-svg{width:100%;height:100%}
+  .gate-titulo{
+    font-family:"Montserrat","Segoe UI",sans-serif;
+    font-size:26px;font-weight:800;letter-spacing:.08em;
+    color:#ffffff;margin:0 0 2px;
+  }
+  .gate-sub{
+    font-family:"Source Sans 3","Segoe UI",sans-serif;
+    font-size:13px;color:#94a3b8;font-weight:600;
+  }
+  .gate-cartao{
+    width:100%;
+    background:rgba(15, 29, 49, 0.78);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(56, 189, 248, 0.22);
+    border-radius:20px;
+    box-shadow:0 12px 35px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding:20px 18px;
+    box-sizing:border-box;
+  }
+  .gate-abas{
+    display:grid;grid-template-columns:1fr 1fr;gap:6px;
+    background:rgba(8, 17, 30, 0.7);
+    padding:4px;border-radius:12px;margin-bottom:18px;
+    border:1px solid rgba(255, 255, 255, 0.06);
+  }
+  .gate-aba-btn{
+    border:none;background:transparent;
+    color:#94a3b8;font-family:"Montserrat","Segoe UI",sans-serif;
+    font-size:13px;font-weight:700;padding:10px 0;
+    border-radius:9px;cursor:pointer;
+    transition:all .2s ease;
+  }
+  .gate-aba-btn.ativa{
+    background:#0284c7;color:#ffffff;
+    box-shadow:0 2px 10px rgba(2, 132, 199, 0.45);
+  }
+  .gate-aviso{
+    padding:10px 12px;border-radius:10px;font-size:12.5px;
+    margin-bottom:14px;line-height:1.4;
+  }
+  .gate-aviso.err{background:rgba(239, 68, 68, 0.16);border:1px solid rgba(239, 68, 68, 0.4);color:#fca5a5}
+  .gate-aviso.ok{background:rgba(16, 185, 129, 0.16);border:1px solid rgba(16, 185, 129, 0.4);color:#6ee7b7}
+
+  .gate-form{display:flex;flex-direction:column;gap:14px}
+  .gate-form[hidden]{display:none !important}
+  .gate-campo{display:flex;flex-direction:column;gap:5px}
+  .gate-campo label{
+    font-family:"Source Sans 3","Segoe UI",sans-serif;
+    font-size:12px;font-weight:700;color:#cbd5e1;
+  }
+  .gate-input-wrapper{
+    display:flex;align-items:center;
+    background:rgba(11, 22, 38, 0.85);
+    border:1px solid rgba(255, 255, 255, 0.14);
+    border-radius:10px;overflow:hidden;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .gate-input-wrapper:focus-within{
+    border-color:#38bdf8;
+    box-shadow:0 0 0 3px rgba(56, 189, 248, 0.22);
+  }
+  .gate-icone{
+    width:38px;display:flex;align-items:center;justify-content:center;
+    color:#64748b;flex-shrink:0;
+  }
+  .gate-input-wrapper input{
+    flex:1;height:44px;background:transparent;border:none;
+    color:#ffffff;font-size:14px;
+    font-family:"Source Sans 3","Segoe UI",sans-serif;
+    padding:0 8px 0 0;box-sizing:border-box;outline:none;
+  }
+  .gate-input-wrapper input::placeholder{color:#475569}
+  .gate-btn-olho{
+    width:42px;height:44px;background:transparent;border:none;
+    display:flex;align-items:center;justify-content:center;
+    color:#64748b;cursor:pointer;
+  }
+  .gate-btn-olho:active{color:#38bdf8}
+
+  .gate-lembrar{
+    display:flex;align-items:center;gap:8px;
+    font-size:12.5px;color:#94a3b8;cursor:pointer;margin-top:2px;
+  }
+  .gate-lembrar input[type="checkbox"]{
+    accent-color:#0284c7;width:16px;height:16px;margin:0;
+  }
+  .gate-btn-submit{
+    width:100%;height:46px;border:none;border-radius:10px;
+    background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color:#ffffff;font-family:"Montserrat","Segoe UI",sans-serif;
+    font-size:14px;font-weight:700;cursor:pointer;
+    box-shadow:0 4px 14px rgba(2, 132, 199, 0.4);
+    margin-top:4px;transition:opacity .2s, transform .15s;
+  }
+  .gate-btn-submit:active{transform:scale(.98);opacity:.9}
+  .gate-btn-cadastrar{
+    background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+    box-shadow:0 4px 14px rgba(234, 88, 12, 0.4);
+  }
+
+  .gate-forca{
+    display:grid;grid-template-columns:repeat(4, 1fr);gap:4px;
+    height:4px;margin-top:6px;
+  }
+  .gate-forca span{background:rgba(255,255,255,0.12);border-radius:2px;transition:background .2s}
+  .gate-forca[data-nivel="1"] span:nth-child(1){background:#ef4444}
+  .gate-forca[data-nivel="2"] span:nth-child(-n+2){background:#f97316}
+  .gate-forca[data-nivel="3"] span:nth-child(-n+3){background:#eab308}
+  .gate-forca[data-nivel="4"] span:nth-child(-n+4){background:#10b981}
+
+  .gate-rodape{
+    text-align:center;margin-top:14px;padding-top:10px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    font-size:11px;color:#64748b;font-weight:600;
+  }
 }
+
 
 </style>
 <script id="mobile-android">
@@ -6393,7 +6546,8 @@ window.selLinhaHTML = function(b) {
       '<button type="button" data-m-esc="-1" style="width:48px;height:44px;border:1px solid var(--cbd);border-radius:10px;background:#fff;font-size:18px;font-weight:700">A−</button>'+
       '<button type="button" data-m-esc="1" style="width:48px;height:44px;border:1px solid var(--cbd);border-radius:10px;background:#fff;font-size:20px;font-weight:700;margin-left:6px">A+</button></div>'+
       '<button class="it" data-m-mais="bases">'+ICONES.base+'<span>Bancos e data-bases<span class="sub">'+esc_(bases||"nenhum banco ligado")+'</span></span></button>'+
-      '<button class="it" data-m-mais="sobre"'+(https?"":" hidden")+'>'+ICONES.sobre+'<span>Sobre e privacidade<span class="sub">sem cadastro, sem coleta de dados</span></span></button>';
+      '<button class="it" data-m-mais="conta">'+ICONES.sobre+'<span>Conta Códice<span class="sub">'+(obterSessaoMobile()?"Conectado · toque para sair":"Não conectado · toque para entrar")+'</span></span></button>'+
+      '<button class="it" data-m-mais="sobre"'+(https?"":" hidden")+'>'+ICONES.sobre+'<span>Sobre e privacidade<span class="sub">sem coleta de dados</span></span></button>';
     m.classList.add("on"); $("m-mais-veu").classList.add("on"); rotaAbrir("mais"); navAtivo();
     m.onclick=function(ev){
       var e=ev.target.closest("[data-m-esc]");
@@ -6406,6 +6560,7 @@ window.selLinhaHTML = function(b) {
       else if(q==="copiar"){ maisFechar(); copiarLink(); }
       else if(q==="instalar"){ maisFechar(); if(M.instalar){ M.instalar.prompt(); M.instalar.userChoice.then(function(){ M.instalar=null; }); } }
       else if(q==="bases"){ maisFechar(); filtrosAbrir(); if(typeof GAVETA!=="undefined"){ GAVETA="bancos"; repintarCtrl(); } }
+      else if(q==="conta"){ maisFechar(); if(obterSessaoMobile()){ sairSessaoMobile(); } else { initAcessoMobile(true); } }
       else if(q==="sobre"){ maisFechar(); window.open("vitrine/","_blank"); }
     };
   }
@@ -6552,9 +6707,256 @@ window.selLinhaHTML = function(b) {
   }
   M.escalaAjustar=escalaAjustar;
   window.addEventListener("resize",escala); window.addEventListener("orientationchange",escala);
+  // ---------- 5. Portão de Autenticação Mobile ----------
+  function obterSessaoMobile(){
+    try{
+      var s = localStorage.getItem("codice_app_auth") || sessionStorage.getItem("codice_app_auth");
+      return s ? JSON.parse(s) : null;
+    }catch(_e){ return null; }
+  }
+  function salvarSessaoMobile(dados, lembrar){
+    try{
+      var str = JSON.stringify(dados);
+      if(lembrar){ localStorage.setItem("codice_app_auth", str); }
+      else { sessionStorage.setItem("codice_app_auth", str); }
+    }catch(_e){}
+  }
+  function sairSessaoMobile(){
+    try{
+      localStorage.removeItem("codice_app_auth");
+      sessionStorage.removeItem("codice_app_auth");
+    }catch(_e){}
+    initAcessoMobile(true);
+  }
+
+  var LOGO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 30 400 360" class="gate-logo-svg" aria-label="Símbolo Códice">' +
+    '<g transform="translate(0, 150)">' +
+      '<polygon points="70,140 250,230 250,280 70,190" fill="#9a3412" />' +
+      '<polygon points="250,230 430,140 430,190 250,280" fill="#ea580c" />' +
+      '<polygon points="70,140 250,50 430,140 250,230" fill="#f97316" stroke="#fed7aa" stroke-width="2" stroke-linejoin="round" />' +
+      '<polygon points="120,140 250,75 380,140 250,205" fill="#c2410c" stroke="#ffedd5" stroke-width="1.5" />' +
+      '<line x1="70" y1="140" x2="120" y2="140" stroke="#ffedd5" stroke-width="2" />' +
+      '<line x1="430" y1="140" x2="380" y2="140" stroke="#ffedd5" stroke-width="2" />' +
+      '<line x1="250" y1="50" x2="250" y2="75" stroke="#ffedd5" stroke-width="2" />' +
+      '<line x1="250" y1="230" x2="250" y2="205" stroke="#ffedd5" stroke-width="2" />' +
+    '</g>' +
+    '<g transform="translate(0, 75)">' +
+      '<polygon points="70,140 250,230 250,280 70,190" fill="#0369a1" />' +
+      '<polygon points="250,230 430,140 430,190 250,280" fill="#0ea5e9" />' +
+      '<polygon points="70,140 250,50 430,140 250,230" fill="#38bdf8" stroke="#bae6fd" stroke-width="2" stroke-linejoin="round" />' +
+      '<polygon points="120,140 250,75 380,140 250,205" fill="#0284c7" stroke="#e0f2fe" stroke-width="1.5" />' +
+      '<line x1="70" y1="140" x2="120" y2="140" stroke="#ffffff" stroke-width="2" />' +
+      '<line x1="430" y1="140" x2="380" y2="140" stroke="#ffffff" stroke-width="2" />' +
+      '<line x1="250" y1="50" x2="250" y2="75" stroke="#ffffff" stroke-width="2" />' +
+      '<line x1="250" y1="230" x2="250" y2="205" stroke="#ffffff" stroke-width="2" />' +
+    '</g>' +
+    '<g transform="translate(0, 0)">' +
+      '<polygon points="70,140 250,230 250,280 70,190" fill="#112338" />' +
+      '<polygon points="250,230 430,140 430,190 250,280" fill="#1e3a5f" />' +
+      '<polygon points="70,140 250,50 430,140 250,230" fill="#244569" stroke="#93c5fd" stroke-width="2" stroke-linejoin="round" />' +
+      '<polygon points="120,140 250,75 380,140 250,205" fill="#14263b" stroke="#60a5fa" stroke-width="1.5" />' +
+      '<line x1="70" y1="140" x2="120" y2="140" stroke="#bfdbfe" stroke-width="2" />' +
+      '<line x1="430" y1="140" x2="380" y2="140" stroke="#bfdbfe" stroke-width="2" />' +
+      '<line x1="250" y1="50" x2="250" y2="75" stroke="#bfdbfe" stroke-width="2" />' +
+      '<line x1="250" y1="230" x2="250" y2="205" stroke="#bfdbfe" stroke-width="2" />' +
+    '</g>' +
+  '</svg>';
+
+  var BP_TOP = '<div class="bp-grid bp-top-right" aria-hidden="true"><svg viewBox="0 0 300 300" fill="none" stroke="rgba(56, 189, 248, 0.14)" stroke-width="1.2"><path d="M50 50 L250 50 L250 250 L50 250 Z"/><path d="M50 50 L250 250"/><path d="M250 50 L50 250"/><path d="M150 20 L280 90 L280 230 L150 160 Z"/><path d="M20 90 L150 20 L150 160 L20 230 Z"/><line x1="0" y1="50" x2="300" y2="50" stroke-dasharray="4 4"/><line x1="0" y1="150" x2="300" y2="150" stroke-dasharray="4 4"/><line x1="0" y1="250" x2="300" y2="250" stroke-dasharray="4 4"/></svg></div>';
+  var BP_BOT = '<div class="bp-grid bp-bottom-left" aria-hidden="true"><svg viewBox="0 0 320 320" fill="none" stroke="rgba(56, 189, 248, 0.14)" stroke-width="1.2"><polygon points="60,180 160,120 260,180 260,300 160,360 60,300"/><line x1="160" y1="120" x2="160" y2="360"/><line x1="60" y1="220" x2="160" y2="160"/><line x1="160" y1="160" x2="260" y2="220"/><line x1="60" y1="260" x2="160" y2="200"/><line x1="160" y1="200" x2="260" y2="260"/></svg></div>';
+
+  function initAcessoMobile(forcar){
+    if(!celular() && !M.app && !forcar) return;
+    if(location.protocol === "file:" && !window.__FORCAR_LOGIN__ && !forcar) return;
+
+    var sessao = obterSessaoMobile();
+    var gate = $("codice-mobile-auth-gate");
+
+    if(sessao && !forcar){
+      if(gate) gate.remove();
+      return;
+    }
+
+    if(!gate){
+      gate = document.createElement("div");
+      gate.id = "codice-mobile-auth-gate";
+      gate.innerHTML = BP_TOP + BP_BOT +
+        '<div class="gate-conteudo">' +
+          '<header class="gate-marca">' +
+            '<div class="gate-logo-glow">' + LOGO_SVG + '</div>' +
+            '<h1 class="gate-titulo">CÓDICE</h1>' +
+            '<div class="gate-sub">Referências de Custos Públicos</div>' +
+          '</header>' +
+          '<div class="gate-cartao">' +
+            '<nav class="gate-abas" aria-label="Autenticação">' +
+              '<button type="button" class="gate-aba-btn ativa" id="gate-aba-login">Entrar</button>' +
+              '<button type="button" class="gate-aba-btn" id="gate-aba-cad">Cadastrar</button>' +
+            '</nav>' +
+            '<div class="gate-aviso err" id="gate-erro" hidden></div>' +
+            '<div class="gate-aviso ok" id="gate-ok" hidden></div>' +
+            '<form id="gate-f-login" class="gate-form">' +
+              '<div class="gate-campo">' +
+                '<label for="gate-email">E-mail ou Usuário</label>' +
+                '<div class="gate-input-wrapper">' +
+                  '<span class="gate-icone"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>' +
+                  '<input id="gate-email" type="email" autocomplete="username" placeholder="nome@exemplo.com" required>' +
+                '</div>' +
+              '</div>' +
+              '<div class="gate-campo">' +
+                '<label for="gate-senha">Senha</label>' +
+                '<div class="gate-input-wrapper">' +
+                  '<span class="gate-icone"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>' +
+                  '<input id="gate-senha" type="password" autocomplete="current-password" placeholder="••••••••••••" required>' +
+                  '<button type="button" class="gate-btn-olho" id="gate-olho-login" aria-label="Mostrar senha"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
+                '</div>' +
+              '</div>' +
+              '<label class="gate-lembrar">' +
+                '<input type="checkbox" id="gate-lembrar" checked>' +
+                '<span>Manter conectado neste aparelho</span>' +
+              '</label>' +
+              '<button type="submit" class="gate-btn-submit" id="gate-btn-entrar">Entrar no Aplicativo</button>' +
+            '</form>' +
+            '<form id="gate-f-cad" class="gate-form" hidden>' +
+              '<div class="gate-campo">' +
+                '<label for="gate-cad-nome">Nome Completo</label>' +
+                '<div class="gate-input-wrapper">' +
+                  '<span class="gate-icone"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>' +
+                  '<input id="gate-cad-nome" type="text" autocomplete="name" placeholder="Engenheiro(a) Lucas" required>' +
+                '</div>' +
+              '</div>' +
+              '<div class="gate-campo">' +
+                '<label for="gate-cad-email">E-mail Profissional</label>' +
+                '<div class="gate-input-wrapper">' +
+                  '<span class="gate-icone"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg></span>' +
+                  '<input id="gate-cad-email" type="email" autocomplete="username" placeholder="seu.email@empresa.com" required>' +
+                '</div>' +
+              '</div>' +
+              '<div class="gate-campo">' +
+                '<label for="gate-cad-senha">Criar Senha (mínimo 15 caracteres)</label>' +
+                '<div class="gate-input-wrapper">' +
+                  '<span class="gate-icone"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>' +
+                  '<input id="gate-cad-senha" type="password" autocomplete="new-password" placeholder="••••••••••••••••" required>' +
+                  '<button type="button" class="gate-btn-olho" id="gate-olho-cad" aria-label="Mostrar senha"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
+                '</div>' +
+                '<div class="gate-forca" id="gate-forca" data-nivel="0"><span></span><span></span><span></span><span></span></div>' +
+              '</div>' +
+              '<button type="submit" class="gate-btn-submit gate-btn-cadastrar" id="gate-btn-cad">Criar Conta</button>' +
+            '</form>' +
+            '<div class="gate-rodape"><span>Códice · Versão Mobile Oficial</span></div>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(gate);
+    }
+    gate.classList.remove("desbloqueado");
+
+    var abaLog = $("gate-aba-login"), abaCad = $("gate-aba-cad");
+    var fLog = $("gate-f-login"), fCad = $("gate-f-cad");
+    var err = $("gate-erro"), ok = $("gate-ok");
+
+    function mudarAba(modo){
+      err.hidden = true; ok.hidden = true;
+      if(modo === "cad"){
+        abaCad.classList.add("ativa"); abaLog.classList.remove("ativa");
+        fCad.hidden = false; fLog.hidden = true;
+      } else {
+        abaLog.classList.add("ativa"); abaCad.classList.remove("ativa");
+        fLog.hidden = false; fCad.hidden = true;
+      }
+    }
+    abaLog.onclick = function(){ mudarAba("log"); };
+    abaCad.onclick = function(){ mudarAba("cad"); };
+
+    function ligarOlho(btnId, inId){
+      var b = $(btnId), inp = $(inId);
+      if(!b || !inp) return;
+      b.onclick = function(){ inp.type = inp.type === "password" ? "text" : "password"; };
+    }
+    ligarOlho("gate-olho-login", "gate-senha");
+    ligarOlho("gate-olho-cad", "gate-cad-senha");
+
+    var inpCadSenha = $("gate-cad-senha"), forcaEl = $("gate-forca");
+    if(inpCadSenha && forcaEl){
+      inpCadSenha.oninput = function(){
+        var s = inpCadSenha.value;
+        var n = s.length;
+        var lvl = 0;
+        if(n > 0){
+          var cls = [/[a-z]/, /[A-Z]/, /\d/, /[^\w]/].filter(function(r){ return r.test(s); }).length;
+          if(n < 8) lvl = 1;
+          else if(n < 15) lvl = 2;
+          else if(n < 20 && cls < 3) lvl = 3;
+          else lvl = 4;
+        }
+        forcaEl.setAttribute("data-nivel", String(lvl));
+      };
+    }
+
+    fLog.onsubmit = function(ev){
+      ev.preventDefault();
+      err.hidden = true; ok.hidden = true;
+      var email = ($("gate-email").value || "").trim();
+      var senha = $("gate-senha").value || "";
+      var lembrar = $("gate-lembrar").checked;
+      var btn = $("gate-btn-entrar");
+
+      if(!email || !senha){
+        err.textContent = "Preencha o e-mail e a senha.";
+        err.hidden = false;
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = "Entrando...";
+
+      setTimeout(function(){
+        btn.disabled = false;
+        btn.textContent = "Entrar no Aplicativo";
+        salvarSessaoMobile({ email: email, loginEm: Date.now() }, lembrar);
+        gate.classList.add("desbloqueado");
+        toast("Acesso autorizado. Bem-vindo!");
+        setTimeout(function(){ if(gate.parentNode) gate.remove(); }, 400);
+      }, 350);
+    };
+
+    fCad.onsubmit = function(ev){
+      ev.preventDefault();
+      err.hidden = true; ok.hidden = true;
+      var nome = ($("gate-cad-nome").value || "").trim();
+      var email = ($("gate-cad-email").value || "").trim();
+      var senha = $("gate-cad-senha").value || "";
+      var btn = $("gate-btn-cad");
+
+      if(!nome || !email || !senha){
+        err.textContent = "Preencha todos os campos.";
+        err.hidden = false;
+        return;
+      }
+      if(senha.length < 15){
+        err.textContent = "Senha curta. Mínimo de 15 caracteres.";
+        err.hidden = false;
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = "Criando conta...";
+
+      setTimeout(function(){
+        btn.disabled = false;
+        btn.textContent = "Criar Conta";
+        salvarSessaoMobile({ nome: nome, email: email, loginEm: Date.now() }, true);
+        gate.classList.add("desbloqueado");
+        toast("Conta criada com sucesso!");
+        setTimeout(function(){ if(gate.parentNode) gate.remove(); }, 400);
+      }, 400);
+    };
+  }
+
+  M.initAcessoMobile = initAcessoMobile;
+  M.obterSessaoMobile = obterSessaoMobile;
+  M.sairSessaoMobile = sairSessaoMobile;
+  window.initAcessoMobile = initAcessoMobile;
+
   function ligar(){
     escala();
-    if(celular()) montarUI();
+    if(celular()){ montarUI(); initAcessoMobile(); }
   }
   if(MQ.addEventListener) MQ.addEventListener("change",ligar); else if(MQ.addListener) MQ.addListener(ligar);
 
@@ -6566,6 +6968,7 @@ window.selLinhaHTML = function(b) {
     navAtivo();
   },120);
 })();
+
 
 </script>
 <style id="codice-ra">
