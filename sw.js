@@ -1,7 +1,9 @@
 /* Service worker do BUSCADOR DE BANCOS V5 — gerado por publicar_pages.py.
    Atualização imediata com skipWaiting() instantâneo e network-first na navegação. */
 'use strict';
-const CACHE = 'buscador-v5-075d5fc7';
+// Versão exclusiva da correção do login móvel: obriga clientes TWA/PWA a
+// descartar o HTML anterior e assumir a nova tela na próxima abertura.
+const CACHE = 'buscador-v5-mobile-bc7e0db';
 const CACHE_FONTES = 'buscador-fontes-v1';
 const PRECACHE = ['./manifest.webmanifest', './icone-192.png', './icone-512.png', './icone-maskable-512.png'];
 
