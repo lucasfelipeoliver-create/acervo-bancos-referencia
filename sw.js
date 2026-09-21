@@ -1,7 +1,7 @@
 /* Service worker do BUSCADOR DE BANCOS V5 — gerado por publicar_pages.py.
    Cache versionado pelo build: publicar build novo troca este arquivo inteiro. */
 'use strict';
-const CACHE = 'buscador-v5-4ca46232';
+const CACHE = 'buscador-v5-ab9d62c5';
 const CACHE_FONTES = 'buscador-fontes-v1';
 /* index UMA vez so no PRECACHE ('./' fora): com './' e './index.html' o addAll
    baixava e guardava os 37 MB em DOBRO (medido 01/09/2026); toda navegacao e
@@ -59,6 +59,18 @@ self.addEventListener('fetch', function (e) {
     if (e.request.mode === 'navigate' && ehSubpasta) { return; }
     e.respondWith(caches.open(CACHE).then(function (c) {
       const alvo = (e.request.mode === 'navigate') ? './index.html' : e.request;
+      // Navegacao inicial do app: tenta a rede primeiro para garantir build novo instantaneo
+      if (e.request.mode === 'navigate') {
+        return fetch(e.request).then(function (resp) {
+          if (resp && resp.ok) {
+            c.put(alvo, resp.clone());
+            return resp;
+          }
+          return c.match(alvo, { ignoreSearch: true });
+        }).catch(function () {
+          return c.match(alvo, { ignoreSearch: true });
+        });
+      }
       return c.match(alvo, { ignoreSearch: true }).then(function (hit) {
         if (hit) { return hit; }
         /* casca leve (16/09/2026): fatia de preco externa (_precos/*.js) entra no cache do build na
