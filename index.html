@@ -5878,7 +5878,7 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
 
 /* 17/09/2026 — medido no aparelho dele (captura 07:38): celular com largura CSS > 767 px renderizava o DESKTOP
    dentro do app. A camada vale para TELA DE TOQUE EM RETRATO (qualquer largura) ou para janela estreita. */
-@media (max-width: 767px), ((pointer: coarse) and (orientation: portrait) and (max-width: 1100px)){
+@media (max-width: 767px), (pointer: coarse) and (orientation: portrait) and (max-width: 1100px){
   :root{--faint:#6b7280;--tinta-muted:#5f6670;--apagado:#5f6670}
   html,body{overscroll-behavior-y:contain}
   /* ESCALA POR LARGURA (pedido dele 17/09 08:13, "continua meio pequeno"): o aparelho reporta muitos px CSS de largura
@@ -6914,6 +6914,19 @@ H+gy/uWSBkPALXwDJ1fbjQy/uWU30R4KvSMR+5iQpIWbNkUKWSRbfIZFXYOlN98w/pG/SEYjnX1Gv3V/
         padding:7px 12px;cursor:pointer;text-decoration:none;min-height:38px}
 #vs-ar:hover{background:#14895a}
 @media (max-width: 767px){#vs-ar{min-height:44px;flex:1 1 100%;justify-content:center}}
+
+/* Login móvel: conserva a marca em seu tamanho original no fundo.
+   Somente o cartão e seus controles recebem escala de toque. */
+@media (max-width: 767px), (pointer: coarse) and (orientation: portrait) and (max-width: 1100px){
+  #codice-mobile-auth-gate{background-image:url("mobile-login-bg-v2.png")!important}
+  #codice-mobile-auth-gate .gate-card{width:calc(100% - 32px)!important;max-width:396px!important;padding:20px 20px 18px!important;gap:14px!important}
+  #codice-mobile-auth-gate .gate-form{gap:14px!important}
+  #codice-mobile-auth-gate .gate-field{height:56px!important;padding:0 16px!important}
+  #codice-mobile-auth-gate .gate-icon{margin-right:12px!important}
+  #codice-mobile-auth-gate .gate-icon svg{width:20px;height:20px}
+  #codice-mobile-auth-gate .gate-input{font-size:16px!important}
+  #codice-mobile-auth-gate .gate-btn-action{min-height:48px;min-width:132px;padding:8px 24px!important;font-size:16px!important}
+}
 
 </style>
 <script id="ra-pranchas-dados">
