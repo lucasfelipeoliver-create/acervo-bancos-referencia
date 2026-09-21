@@ -6230,8 +6230,8 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
     z-index: 99999;
     background: #081627 url("mobile-login-bg-v2.png?v=f2eecb1") no-repeat center top / cover !important;
     display: flex !important; flex-direction: column !important;
-    align-items: center !important; justify-content: flex-end !important;
-    padding: 0 18px clamp(24px, 5.5vh, 44px) !important;
+    align-items: stretch !important; justify-content: flex-end !important;
+    padding: 0 !important;
     box-sizing: border-box !important;
     transition: opacity .25s ease, transform .25s ease;
     pointer-events: auto;
@@ -6240,13 +6240,16 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
     opacity: 0 !important; pointer-events: none !important; transform: scale(1.02) !important;
   }
   .gate-card {
-    width: min(92%, 400px) !important;
-    background: rgba(13, 27, 44, 0.88) !important;
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(217, 154, 78, 0.65) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-    padding: 16px 18px 12px !important;
+    width: 100% !important;
+    background: rgba(10, 22, 38, 0.96) !important;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(217, 154, 78, 0.5) !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+    padding: 24px 24px 32px !important;
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
   }
@@ -6790,7 +6793,7 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
           '<form id="gate-form-login" class="gate-form" onsubmit="return false;">' +
             '<div class="gate-field">' +
               '<span class="gate-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>' +
-              '<input type="text" class="gate-input" id="gate-login-usr" placeholder="usuário" autocomplete="username">' +
+              '<input type="text" class="gate-input" id="gate-login-usr" placeholder="usuário ou e-mail" autocomplete="username">' +
             '</div>' +
             '<div class="gate-field">' +
               '<span class="gate-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>' +
@@ -6803,13 +6806,17 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
               '<button type="button" class="gate-btn-action" id="gate-btn-login">Login</button>' +
             '</div>' +
             '<div class="gate-quick">' +
-              '<button type="button" class="gate-btn-quick" id="gate-btn-quick-login">Entrar sem login (Acesso Rápido) →</button>' +
+              '<button type="button" class="gate-btn-quick" id="gate-btn-quick-login">Entrar sem login (Acesso Rápido) &rarr;</button>' +
             '</div>' +
           '</form>' +
           '<form id="gate-form-cad" class="gate-form" hidden onsubmit="return false;">' +
             '<div class="gate-field">' +
               '<span class="gate-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>' +
-              '<input type="text" class="gate-input" id="gate-cad-nome" placeholder="nome ou usuário" autocomplete="name">' +
+              '<input type="text" class="gate-input" id="gate-cad-nome" placeholder="nome completo" autocomplete="name">' +
+            '</div>' +
+            '<div class="gate-field">' +
+              '<span class="gate-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/></svg></span>' +
+              '<input type="email" class="gate-input" id="gate-cad-email" placeholder="e-mail profissional" autocomplete="email">' +
             '</div>' +
             '<div class="gate-field">' +
               '<span class="gate-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>' +
@@ -6822,7 +6829,7 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
               '<button type="button" class="gate-btn-action" id="gate-btn-cad">Cadastrar</button>' +
             '</div>' +
             '<div class="gate-quick">' +
-              '<button type="button" class="gate-btn-quick" id="gate-btn-quick-cad">Entrar sem login (Acesso Rápido) →</button>' +
+              '<button type="button" class="gate-btn-quick" id="gate-btn-quick-cad">Entrar sem login (Acesso Rápido) &rarr;</button>' +
             '</div>' +
           '</form>' +
         '</div>';
