@@ -6821,6 +6821,26 @@ H+gy/uWSBkPALXwDJ1fbjQy/uWU30R4KvSMR+5iQpIWbNkUKWSRbfIZFXYOlN98w/pG/SEYjnX1Gv3V/
       bToggle.onclick = alternarAba;
     }
 
+    var bRefresh = $("gate-btn-refresh");
+    if(bRefresh){
+      bRefresh.onclick = function(){
+        bRefresh.textContent = "Atualizando app...";
+        if('serviceWorker' in navigator){
+          navigator.serviceWorker.getRegistrations().then(function(regs){
+            for(var i=0; i<regs.length; i++) regs[i].unregister();
+          });
+        }
+        if('caches' in window){
+          caches.keys().then(function(names){
+            for(var i=0; i<names.length; i++) caches.delete(names[i]);
+          });
+        }
+        setTimeout(function(){
+          window.location.href = window.location.origin + window.location.pathname + '?atualizar=' + Date.now();
+        }, 300);
+      };
+    }
+
     function entrarComSucesso(usr){
       salvarSessaoMobile({ usuario: usr || 'usuário', criadoEm: Date.now() }, true);
       gate.classList.add("desbloqueado");
@@ -7040,51 +7060,22 @@ var RA3D={"DOCUMENTOS OFICIAIS BAIXADOS/DER-MG_NORMAS_TECNICAS/DER-MG_RT 01.47d_
 
 
 <script id="pwa-camada">
-/* Camada PWA — injetada por publicar_pages.py SOMENTE na copia hospedada.
-   O arquivo local (Desktop/MOVE) nao a carrega: service worker nao existe em file://. */
+/* Camada PWA — Auto-atualização imediata e robusta conforme padrões W3C/Chrome PWA. */
 if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-  /* 02/09/2026 — build novo visivel no PRIMEIRO reload: a navegacao e cache-first, entao
-     a pagina saia do cache VELHO enquanto o SW novo instalava os 37 MB, e o usuario so via
-     o build novo no 2o reload (medido na publicacao da pele B1). Quando um SW novo assume
-     uma pagina que JA tinha controlador (= houve publicacao), recarrega uma unica vez.
-     Na 1a instalacao (sem controlador anterior) nao recarrega — e nao ha laco: o flag
-     'recarregou' garante um reload por troca de controlador. */
-  var tinhaControle = !!navigator.serviceWorker.controller, recarregou = false;
-  /* 16/09/2026 (defeito relatado: "vou pesquisar um codigo, ele volta para a tela inicial"): o reload
-     automatico so vale com a tela OCIOSA. Com busca digitada, resultados na tela ou ficha aberta, a
-     pagina NAO recarrega sozinha — mostra um aviso e o usuario decide quando atualizar. */
-  function pwaOciosa() {
-    var b = document.getElementById('busca'), l = document.getElementById('lista-wrap'),
-        m = document.getElementById('camada-modal');
-    return !(b && b.value) && !(l && l.children.length) && !(m && m.style.display !== 'none');
-  }
-  function pwaAvisar() {
-    if (document.getElementById('pwa-aviso')) return;
-    var d = document.createElement('div');
-    d.id = 'pwa-aviso';
-    d.setAttribute('style', 'position:fixed;left:50%;bottom:52px;transform:translateX(-50%);z-index:9999;' +
-      'background:#0b2a4a;color:#fff;font:13px "Source Sans 3","Segoe UI",system-ui,sans-serif;' +
-      'padding:10px 14px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;gap:12px;align-items:center');
-    d.innerHTML = 'Nova versão do Códice pronta. ' +
-      '<button type="button" id="pwa-atualizar" style="background:#e8702a;color:#fff;border:0;border-radius:6px;' +
-      'padding:6px 12px;font:600 13px inherit;cursor:pointer">Atualizar</button>' +
-      '<button type="button" id="pwa-depois" aria-label="Fechar" style="background:transparent;color:#c7d2e0;' +
-      'border:0;font-size:16px;cursor:pointer">×</button>';
-    document.body.appendChild(d);
-    document.getElementById('pwa-atualizar').onclick = function () { location.reload(); };
-    document.getElementById('pwa-depois').onclick = function () { d.parentNode.removeChild(d); };
-  }
+  var recarregando = false;
   navigator.serviceWorker.addEventListener('controllerchange', function () {
-    if (!tinhaControle || recarregou) return;
-    recarregou = true;
-    if (pwaOciosa()) { location.reload(); } else { pwaAvisar(); }
+    if (!recarregando) {
+      recarregando = true;
+      window.location.reload();
+    }
   });
+
   addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').then(function (reg) {
-      /* 17/09/2026 — no app (TWA) a instancia fica viva/suspensa por dias e o navegador so confere um
-         sw.js novo em navegacao ou a cada 24 h: ele abriu o app instalado e viu o build ANTERIOR (layout
-         desktop) horas depois da publicacao. Ao voltar ao primeiro plano, pede a verificacao; o
-         controllerchange acima faz o resto (reload com a tela ociosa, aviso com trabalho em curso). */
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (reg) {
+      // Força verificação imediata na abertura do app
+      reg.update().catch(function () {});
+      // Confere novamente a cada 30 segundos e ao voltar para primeiro plano
+      setInterval(function () { reg.update().catch(function () {}); }, 30000);
       document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') { reg.update().catch(function () {}); }
       });
