@@ -6803,6 +6803,30 @@ H+gy/uWSBkPALXwDJ1fbjQy/uWU30R4KvSMR+5iQpIWbNkUKWSRbfIZFXYOlN98w/pG/SEYjnX1Gv3V/
 
       document.body.appendChild(gate);
     }
+
+    // A tela de login só existe no TWA: posiciona o cartão em relação à marca
+    // e aplica alvos de toque legíveis sem depender de media queries.
+    gate.style.setProperty("justify-content", "flex-start", "important");
+    gate.style.setProperty("padding", "calc(env(safe-area-inset-top, 0px) + 57vh) 18px 0", "important");
+    gate.style.setProperty("box-sizing", "border-box", "important");
+    var cartaoLogin = gate.querySelector(".gate-card");
+    if(cartaoLogin){
+      cartaoLogin.style.setProperty("width", "calc(100% - 36px)", "important");
+      cartaoLogin.style.setProperty("max-width", "480px", "important");
+      cartaoLogin.style.setProperty("padding", "22px", "important");
+      cartaoLogin.style.setProperty("gap", "16px", "important");
+    }
+    gate.querySelectorAll(".gate-form").forEach(function(formulario){ formulario.style.setProperty("gap", "16px", "important"); });
+    gate.querySelectorAll(".gate-field").forEach(function(campo){
+      campo.style.setProperty("height", "64px", "important");
+      campo.style.setProperty("padding", "0 18px", "important");
+    });
+    gate.querySelectorAll(".gate-input").forEach(function(campo){ campo.style.setProperty("font-size", "18px", "important"); });
+    gate.querySelectorAll(".gate-btn-action").forEach(function(botao){
+      botao.style.setProperty("min-height", "54px", "important");
+      botao.style.setProperty("min-width", "150px", "important");
+      botao.style.setProperty("font-size", "17px", "important");
+    });
     gate.classList.remove("desbloqueado");
 
     var fLogin = $("gate-form-login");
