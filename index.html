@@ -6743,21 +6743,21 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
   // ---------- 5. Portão de Autenticação Mobile ----------
   function obterSessaoMobile(){
     try{
-      var s = sessionStorage.getItem("codice_sessao_ativa") || localStorage.getItem("codice_app_auth");
+      var s = sessionStorage.getItem("codice_sessao_ativa_v2") || localStorage.getItem("codice_app_auth_v2");
       return s ? JSON.parse(s) : null;
     }catch(_e){ return null; }
   }
   function salvarSessaoMobile(dados, lembrar){
     try{
       var str = JSON.stringify(dados);
-      sessionStorage.setItem("codice_sessao_ativa", str);
-      if(lembrar){ localStorage.setItem("codice_app_auth", str); }
+      sessionStorage.setItem("codice_sessao_ativa_v2", str);
+      if(lembrar){ localStorage.setItem("codice_app_auth_v2", str); }
     }catch(_e){}
   }
   function sairSessaoMobile(){
     try{
-      localStorage.removeItem("codice_app_auth");
-      sessionStorage.removeItem("codice_sessao_ativa");
+      localStorage.removeItem("codice_app_auth_v2");
+      sessionStorage.removeItem("codice_sessao_ativa_v2");
     }catch(_e){}
     initAcessoMobile(true);
   }
@@ -6767,7 +6767,7 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
     if(location.protocol === "file:" && !window.__FORCAR_LOGIN__ && !forcar) return;
 
     var sessao = null;
-    try { sessao = sessionStorage.getItem("codice_sessao_ativa") || localStorage.getItem("codice_app_auth"); } catch(_e){}
+    try { sessao = sessionStorage.getItem("codice_sessao_ativa_v2") || localStorage.getItem("codice_app_auth_v2"); } catch(_e){}
     var gate = $("codice-mobile-auth-gate");
 
     if(sessao && !forcar){

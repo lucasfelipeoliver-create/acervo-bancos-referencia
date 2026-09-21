@@ -3,7 +3,7 @@
 'use strict';
 // Versão exclusiva da correção do login móvel: obriga clientes TWA/PWA a
 // descartar o HTML anterior e assumir a nova tela na próxima abertura.
-const CACHE = 'buscador-v5-mobile-login-f2eecb1';
+const CACHE = 'buscador-v5-mobile-login-v2';
 const CACHE_FONTES = 'buscador-fontes-v1';
 const PRECACHE = ['./manifest.webmanifest', './icone-192.png', './icone-512.png', './icone-maskable-512.png'];
 
