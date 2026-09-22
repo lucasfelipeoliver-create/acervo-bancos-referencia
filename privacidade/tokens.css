@@ -1,0 +1,29 @@
+/* CÓDICE — tokens de marca das superfícies CLARAS (vitrine, planos, conta, privacidade).
+   Fonte: canvas aprovado 16/09/2026 (prancha Vitrine2, https://claude.ai/artifact/Q7A6VFeovubkBp3zxsqYv1)
+   + direção B da cobrança (18/09/2026). Os mesmos 8 valores viviam duplicados e com nomes
+   divergentes em 3 arquivos (vitrine/index.html, privacidade/index.html, cobranca.css) —
+   consolidados aqui em 22/09/2026 (achado: --azul já tinha drift entre acesso/entrar e o
+   resto por causa disso — ver acesso.css, tema escuro próprio, NÃO toca este arquivo).
+
+   CANÔNICO É ESTE ARQUIVO. As 3 cópias abaixo são DEPLOY (cada host/publicador exige o
+   arquivo físico na própria pasta — GitHub Pages copia raso, sem subpasta) e têm de ficar
+   byte-idênticas a este; sincronizar com sincronizar_tokens_marca.py --verificar|--aplicar:
+     - build_v5/vitrine/tokens.css
+     - build_v5/privacidade/tokens.css
+     - build_v5/cobranca/vitrine/planos/tokens.css
+
+   acesso/entrar/acesso.css NÃO importa este arquivo: declara a própria diretriz ("Blueprint
+   Dark Glassmorphism") com --marinho/--laranja iguais a estes por coincidência de aprovação,
+   não por herança — mexer lá é decisão de layout, não bug a corrigir.
+*/
+:root{
+  --marinho:#0b2a4a;
+  --laranja:#e8702a;
+  --azul:#0b4f8a;
+  --ambar:#f0a24a;
+  --fundo:#f1f4f8;
+  --texto:#1f2933;
+  --apagado:#52606d;
+  --fio:#e4e7eb;
+  --cbd:#cbd2d9;
+}
