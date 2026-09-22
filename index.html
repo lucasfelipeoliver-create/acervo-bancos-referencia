@@ -23,7 +23,13 @@
      antigos continuam existindo com o papel que a pele lhes dá (--azul = tinta
      estrutural; --acento = vermelho). O desenho A (prancha técnica, 25-26/08)
      fica no histórico do canvas das telas. Ids e classes do DOM INTACTOS: o
-     portão e a camada mobile do publicador dependem deles. */
+     portão e a camada mobile do publicador dependem deles.
+     22/09/2026: este bloco está MORTO em produção -- o :root da PELE B2 (~linha
+     479, "INSTITUCIONAL AZUL", aprovada 16/09) vem DEPOIS no CSS e redefine as
+     MESMAS variáveis, então sempre vence a cascata. Confirmado por execução real
+     (getComputedStyle(--azul) devolveu o valor da B2, não deste bloco) durante a
+     padronização de identidade visual de 22/09 -- por isso os valores aqui ficam
+     como estavam (vermelho), fiéis ao próprio comentário "fica no histórico". */
   :root{
     --bg:#ffffff; --panel:#ffffff; --panel2:#f7f7f7; --ink:#262626;
     --azul:#262626; --azul-esc:#262626; --acento:#e63c2f; --muted:#494a52; --faint:#9ca0a8;
@@ -920,9 +926,9 @@
              box-shadow:0 6px 20px rgba(0,0,0,.15);z-index:50;overflow:hidden">
           <a href="vitrine/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
              text-decoration:none;border-bottom:1px solid var(--fio)">Vitrine</a>
-          <a href="vitrine/planos/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
+          <a href="vitrine/planos/" id="menu-link-planos" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
              text-decoration:none;border-bottom:1px solid var(--fio)">Planos</a>
-          <a href="entrar/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
+          <a href="entrar/" id="menu-link-entrar" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
              text-decoration:none;border-bottom:1px solid var(--fio)">Entrar / Minha conta</a>
           <a href="privacidade/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
              text-decoration:none">Privacidade</a>
@@ -4920,6 +4926,16 @@ document.addEventListener("click",function(ev){
   var caixa=document.getElementById("menu-site-caixa");
   if(!caixa.contains(ev.target)) document.getElementById("menu-site").hidden=true;
 });
+// 22/09/2026 (achado na verificação de UX real): Planos e Entrar/Conta só existem no Cloudflare
+// (login/cobrança dependem de Functions, que o GitHub Pages não roda) -- confirmado ao vivo, os
+// dois davam 404 fora de codice-f12.pages.dev. Vitrine e Privacidade são estáticas e existem nos
+// dois lugares, então ficam relativas (não saem da aba). Só reescreve fora do host do Cloudflare.
+if (location.hostname !== "codice-f12.pages.dev") {
+  var lp = document.getElementById("menu-link-planos");
+  var le = document.getElementById("menu-link-entrar");
+  if (lp) lp.href = "https://codice-f12.pages.dev/vitrine/planos/";
+  if (le) le.href = "https://codice-f12.pages.dev/entrar/";
+}
 document.getElementById("btn-analitica").onclick=function(){
   if(!S.fichaAberta) return;
   abrirFicha(S.fichaAberta);
@@ -6564,7 +6580,10 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
       // 22/09/2026 (pedido dele): de dentro do buscador nao dava pra chegar em planos/vitrine pelo
       // celular. "planos"/"site" sao novos; "sobre" tinha o ROTULO de privacidade mas abria a
       // vitrine (bug — corrigido pra abrir o que o rotulo promete).
-      else if(q==="planos"){ maisFechar(); window.open("vitrine/planos/","_blank"); }
+      // Mesmo achado do menu desktop (verificação de UX real, 22/09): "planos" só existe no
+      // Cloudflare (depende de Functions) -- fora de codice-f12.pages.dev abre a URL absoluta de lá;
+      // "site"/vitrine e "sobre"/privacidade existem nos dois hosts, continuam relativos.
+      else if(q==="planos"){ maisFechar(); window.open(location.hostname==="codice-f12.pages.dev"?"vitrine/planos/":"https://codice-f12.pages.dev/vitrine/planos/","_blank"); }
       else if(q==="site"){ maisFechar(); window.open("vitrine/","_blank"); }
       else if(q==="sobre"){ maisFechar(); window.open("privacidade/","_blank"); }
     };
