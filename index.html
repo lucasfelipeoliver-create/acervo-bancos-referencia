@@ -6230,9 +6230,10 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
     z-index: 99999;
     background: #081627 url("mobile-login-bg-v2.png?v=f2eecb1") no-repeat center top / cover !important;
     display: flex !important; flex-direction: column !important;
-    align-items: stretch !important; justify-content: flex-end !important;
-    padding: 0 !important;
+    align-items: center !important; justify-content: flex-start !important;
+    padding: calc(47.5vh + 14px) 16px 24px !important;
     box-sizing: border-box !important;
+    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
     transition: opacity .25s ease, transform .25s ease;
     pointer-events: auto;
   }
@@ -6240,19 +6241,19 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
     opacity: 0 !important; pointer-events: none !important; transform: scale(1.02) !important;
   }
   .gate-card {
-    width: 100% !important;
-    background: rgba(10, 22, 38, 0.96) !important;
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(217, 154, 78, 0.5) !important;
-    border-bottom: none !important;
-    border-left: none !important;
-    border-right: none !important;
-    border-radius: 20px 20px 0 0 !important;
-    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
-    padding: 24px 24px 32px !important;
+    width: min(84%, 318px) !important;
+    max-width: 320px !important;
+    margin: 0 !important;
+    background: rgba(10, 22, 38, 0.88) !important;
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(217, 154, 78, 0.65) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    padding: 16px 16px 14px !important;
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
   }
+
   .gate-tabs {
     display: flex !important; gap: 18px !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -6278,7 +6279,7 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
     display: flex !important; align-items: center !important;
     background: rgba(18, 34, 54, 0.9) !important;
     border: 1px solid rgba(75, 105, 140, 0.5) !important;
-    border-radius: 6px !important; height: 50px !important; padding: 0 14px !important;
+    border-radius: 6px !important; height: 44px !important; padding: 0 12px !important;
     transition: border-color .2s, box-shadow .2s !important;
     box-sizing: border-box !important;
   }
@@ -6291,7 +6292,7 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
   }
   .gate-input {
     flex: 1 !important; background: transparent !important; border: none !important; outline: none !important;
-    color: #ffffff !important; font-size: 16px !important; font-family: inherit !important;
+    color: #ffffff !important; font-size: 14.5px !important; font-family: inherit !important;
   }
   .gate-input::placeholder { color: #627d98 !important; }
   .gate-btn-eye {
