@@ -1,7 +1,7 @@
 /* Service worker do BUSCADOR DE BANCOS V5 — gerado por publicar_pages.py.
    Atualização imediata com skipWaiting() instantâneo e network-first na navegação. */
 'use strict';
-const CACHE = 'buscador-v5-63826c20';
+const CACHE = 'buscador-v5-f8f7e1ea';
 const CACHE_FONTES = 'buscador-fontes-v1';
 const PRECACHE = ['./manifest.webmanifest', './icone-192.png', './icone-512.png', './icone-maskable-512.png'];
 

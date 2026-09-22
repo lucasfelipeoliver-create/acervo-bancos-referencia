@@ -918,13 +918,13 @@
         <div id="menu-site" hidden style="position:absolute;top:calc(100% + 6px);right:0;min-width:190px;
              background:var(--panel);border:1px solid var(--borda);border-radius:8px;
              box-shadow:0 6px 20px rgba(0,0,0,.15);z-index:50;overflow:hidden">
-          <a href="/vitrine/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
+          <a href="vitrine/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
              text-decoration:none;border-bottom:1px solid var(--fio)">Vitrine</a>
-          <a href="/vitrine/planos/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
+          <a href="vitrine/planos/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
              text-decoration:none;border-bottom:1px solid var(--fio)">Planos</a>
-          <a href="/entrar/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
+          <a href="entrar/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
              text-decoration:none;border-bottom:1px solid var(--fio)">Entrar / Minha conta</a>
-          <a href="/privacidade/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
+          <a href="privacidade/" style="display:block;padding:10px 14px;font-size:13px;color:var(--ink);
              text-decoration:none">Privacidade</a>
         </div>
       </div>
@@ -6564,9 +6564,9 @@ html.gate-ativa{zoom:1!important;width:100%!important;height:100%!important;over
       // 22/09/2026 (pedido dele): de dentro do buscador nao dava pra chegar em planos/vitrine pelo
       // celular. "planos"/"site" sao novos; "sobre" tinha o ROTULO de privacidade mas abria a
       // vitrine (bug — corrigido pra abrir o que o rotulo promete).
-      else if(q==="planos"){ maisFechar(); window.open("/vitrine/planos/","_blank"); }
-      else if(q==="site"){ maisFechar(); window.open("/vitrine/","_blank"); }
-      else if(q==="sobre"){ maisFechar(); window.open("/privacidade/","_blank"); }
+      else if(q==="planos"){ maisFechar(); window.open("vitrine/planos/","_blank"); }
+      else if(q==="site"){ maisFechar(); window.open("vitrine/","_blank"); }
+      else if(q==="sobre"){ maisFechar(); window.open("privacidade/","_blank"); }
     };
   }
   function maisFechar(){
