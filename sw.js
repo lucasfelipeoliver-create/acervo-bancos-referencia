@@ -49,6 +49,17 @@ self.addEventListener('fetch', function (e) {
     if (e.request.mode === 'navigate' && ehSubpasta) { return; }
 
     // NAVEGAÇÃO DA APLICAÇÃO: NETWORK-FIRST COM FALLBACK PARA CACHE OFFLINE
+    // 22/09/2026 (achado ao vivo, aba "Planejamento de controle de acesso" 852dc696 + confirmado por
+    // execução real): com o porteiro de acesso ligado, a raiz nunca mais responde 200 pra quem não tem
+    // sessão -- SEMPRE 302. fetch() dentro do SW numa navegação usa redirect:'manual', então a resposta
+    // chega como opaqueredirect (status 0, ok=false), NUNCA cai no primeiro `if`. Isso jogava pro cache
+    // de ./index.html, que nunca tinha sido preenchido (só enche em navegação `ok`, que com o porteiro
+    // não acontece mais) -- c.match() vinha undefined e respondWith(undefined) é erro de rede duro:
+    // Chrome mostrava ERR_FAILED pra qualquer aparelho que já tivesse o SW antigo instalado. Um
+    // redirecionamento (opaqueredirect) é resposta LEGÍTIMA: devolver direto deixa o navegador seguir
+    // o Location de verdade (é o jeito padrão de um SW ser transparente a redirect). Só cai no cache
+    // quando a rede FALHA de verdade -- e mesmo aí, cache vazio agora cai num fetch() simples em vez de
+    // undefined.
     if (e.request.mode === 'navigate') {
       e.respondWith(
         fetch(e.request, { cache: 'no-store' }).then(function (resp) {
@@ -57,9 +68,14 @@ self.addEventListener('fetch', function (e) {
             caches.open(CACHE).then(function (c) { c.put('./index.html', clone); });
             return resp;
           }
-          return caches.open(CACHE).then(function (c) { return c.match('./index.html'); });
+          if (resp && (resp.type === 'opaqueredirect' || resp.redirected)) { return resp; }
+          return caches.open(CACHE).then(function (c) {
+            return c.match('./index.html').then(function (hit) { return hit || fetch(e.request); });
+          });
         }).catch(function () {
-          return caches.open(CACHE).then(function (c) { return c.match('./index.html'); });
+          return caches.open(CACHE).then(function (c) {
+            return c.match('./index.html').then(function (hit) { return hit || fetch(e.request); });
+          });
         })
       );
       return;
