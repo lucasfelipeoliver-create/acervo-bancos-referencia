@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Códice para Android — os 13 bancos oficiais no celular</title>
+<meta name="description" content="Baixe o app do Códice para Android: SINAPI, SICRO, SICOR, SUDECAP e mais nove bancos oficiais no celular, com preço onerado e desonerado, composição analítica e critério de medição.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  /* ABA "APP ANDROID" DA VITRINE — canvas aprovado por ele em 23/09/2026 ("pode publicar"):
+     https://claude.ai/artifact/H2xdpWScvEP2dWHwDXAF3Y. Cores de marca em ../tokens.css; aqui só os locais.
+     Links RELATIVOS de propósito: a mesma página serve no Cloudflare (raiz /) e no GitHub Pages
+     (/acervo-bancos-referencia/). O APK só existe no GitHub Pages (publicar_apk.py) — link absoluto. */
+  :root{
+    --marinho-2:#123a63; --papel:#ffffff;
+    --sombra:0 1px 2px rgba(16,24,40,.06),0 6px 18px rgba(16,24,40,.07);
+    --ff-h:"Montserrat","Segoe UI",sans-serif;
+    --ff-b:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+    --ff-m:"IBM Plex Mono",Consolas,monospace;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--fundo);color:var(--texto);font-family:var(--ff-b);font-size:16px;line-height:1.5}
+  a{color:var(--azul);text-decoration:none}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--ambar);outline-offset:3px;border-radius:8px}
+  .wrap{max-width:1296px;margin:0 auto;padding-inline:24px}
+  .mono{font-family:var(--ff-m);font-variant-numeric:tabular-nums}
+  h1,h2,h3{font-family:var(--ff-h);text-wrap:balance;margin:0}
+
+
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--ff-h);font-weight:700;font-size:15px;color:#fff;background:var(--laranja);padding:15px 26px;border-radius:8px;border:0;cursor:pointer}
+  .btn:hover{background:#d3621f;color:#fff}
+  .btn svg{flex-shrink:0}
+  .btn-ghost{display:inline-flex;align-items:center;font-family:var(--ff-h);font-weight:700;font-size:15px;color:#fff;padding:14px 22px;border:1.5px solid rgba(255,255,255,.5);border-radius:8px}
+  .btn-ghost:hover{border-color:#fff;color:#fff}
+
+  /* ===== HERO ===== */
+  header.hero{position:relative;background:var(--marinho);color:#fff;overflow:hidden}
+  header.hero img.fundo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+  header.hero .veu{position:absolute;inset:0;background:linear-gradient(100deg,rgba(11,42,74,.96) 0%,rgba(11,42,74,.86) 48%,rgba(11,42,74,.55) 100%)}
+  nav{position:relative;height:66px;display:flex;align-items:center;gap:32px}
+  nav .marca img{display:block;width:172px;height:auto}
+  nav .links{display:flex;gap:26px;font-size:15px;font-weight:600}
+  nav .links a{color:#c7d2e0} nav .links a:hover{color:#fff}
+  nav .links a.ativo{color:#fff;box-shadow:inset 0 -2px 0 var(--laranja);padding-bottom:4px}
+  nav .acoes{margin-left:auto;display:flex;gap:12px;align-items:center}
+  nav .entrar{font-size:15px;font-weight:600;color:#fff}
+  nav .btn{padding:11px 20px;font-size:14px}
+  .hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;align-items:end;padding-top:56px}
+  .hero-txt{display:flex;flex-direction:column;gap:22px;padding-bottom:72px}
+  .selo{display:inline-flex;align-items:center;gap:10px;align-self:flex-start;font-family:var(--ff-m);font-size:12.5px;color:#dbe4ee;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:6px 14px 6px 8px}
+  .selo i{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#3ddc84;color:#0b2a4a;font-style:normal}
+  .hero-txt h1{font-size:54px;font-weight:800;line-height:1.06;letter-spacing:-.015em;max-width:14ch}
+  .hero-txt h1 em{font-style:normal;color:var(--ambar)}
+  .hero-txt p.lede{margin:0;font-size:19.5px;color:#dbe4ee;max-width:58ch}
+  .hero-txt .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+  .hero-txt .prova{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13.5px;color:#c7d2e0}
+  .hero-txt .prova b{font-family:var(--ff-m);font-weight:500;color:#fff}
+
+  /* telefone (moldura comum ao hero e à demonstração) */
+  .fone{position:relative;background:#0a1626;border-radius:44px;padding:12px;box-shadow:0 30px 60px rgba(2,10,22,.45),inset 0 0 0 1.5px #2b3d55}
+  .fone::before{content:"";position:absolute;top:22px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:#1d2d42;z-index:3}
+  .tela{position:relative;aspect-ratio:412/915;border-radius:32px;overflow:hidden;background:#fff}
+  .tela img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+  .hero .fone{width:360px;max-width:100%;border-radius:44px 44px 0 0;padding-bottom:0;margin-bottom:-2px}
+  .hero .fone .tela{border-radius:32px 32px 0 0;aspect-ratio:412/640}
+
+  /* ===== SEÇÕES ===== */
+  section{padding-block:80px 24px}
+  .olho{font-family:var(--ff-m);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--laranja);margin:0 0 12px}
+  h2{font-size:34px;font-weight:700;color:var(--marinho);line-height:1.15;max-width:22ch}
+  .intro{color:var(--apagado);font-size:17px;max-width:60ch;margin:14px 0 0}
+
+  /* ===== DEMONSTRAÇÃO ===== */
+  .demo{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:64px;align-items:start;margin-top:40px}
+  .passos{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .passo button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:36px minmax(0,1fr);gap:4px 14px;width:100%;padding:16px 18px;border-radius:12px;cursor:pointer;position:relative;overflow:hidden}
+  .passo button:hover{background:rgba(11,79,138,.05)}
+  .passo button:focus-visible{outline:3px solid var(--ambar);outline-offset:0}
+  .passo .n{grid-row:span 2;font-family:var(--ff-m);font-size:13px;color:var(--apagado);padding-top:3px}
+  .passo .t{font-family:var(--ff-h);font-weight:700;font-size:17px;color:var(--marinho)}
+  .passo .d{grid-column:2;font-size:15px;color:var(--apagado);max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease}
+  .passo.ativo button{background:var(--papel);box-shadow:var(--sombra)}
+  .passo.ativo .n{color:var(--laranja)}
+  .passo.ativo .d{max-height:120px;opacity:1}
+  .passo .barra{position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--laranja)}
+  .passo.ativo .barra.corre{animation:enche var(--dur,5s) linear forwards}
+  @keyframes enche{to{width:100%}}
+  .demo-ctl{display:flex;gap:10px;align-items:center;margin-top:18px;padding-left:18px;font-size:14px;color:var(--apagado)}
+  .demo-ctl button{font:inherit;font-weight:600;color:var(--azul);background:none;border:1px solid var(--cbd);border-radius:999px;padding:6px 14px;cursor:pointer}
+  .demo-ctl button:hover{border-color:var(--azul)}
+
+  .demo .fone{width:340px;max-width:100%;justify-self:center}
+  .tela .cam{transition:opacity .45s ease,transform .45s cubic-bezier(.2,.7,.2,1)}
+  .tela .cam.fora{opacity:0;transform:translateX(18%)}
+  .foco{position:absolute;border-radius:10px;box-shadow:0 0 0 2.5px var(--laranja),0 0 0 999px rgba(11,42,74,.46);transition:top .5s cubic-bezier(.2,.7,.2,1),left .5s,width .5s,height .5s;pointer-events:none;z-index:2}
+  .toque{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgba(232,112,42,.35);border:2px solid #fff;z-index:3;pointer-events:none;opacity:0}
+  .toque.bate{animation:bate .9s ease-out}
+  @keyframes bate{0%{opacity:0;transform:scale(.4)}25%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.7)}}
+  .legenda{position:absolute;left:10px;right:10px;z-index:4;background:var(--marinho);color:#fff;font-size:12.5px;line-height:1.35;padding:9px 12px;border-radius:10px;box-shadow:0 8px 20px rgba(2,10,22,.35);transition:top .5s cubic-bezier(.2,.7,.2,1)}
+  .legenda b{font-family:var(--ff-m);font-weight:500;color:var(--ambar)}
+
+  /* ===== RECURSOS ===== */
+  .recursos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--fio);border:1px solid var(--fio);border-radius:14px;overflow:hidden;margin-top:36px}
+  .rec{background:var(--papel);padding:26px 24px;display:flex;flex-direction:column;gap:10px}
+  .rec svg{color:var(--azul)}
+  .rec h3{font-size:17px;color:var(--marinho)}
+  .rec p{margin:0;font-size:15px;color:var(--apagado)}
+  .rec .dado{margin-top:auto;padding-top:10px;font-family:var(--ff-m);font-size:12.5px;color:var(--texto)}
+
+  /* ===== DOWNLOAD ===== */
+  .baixar{background:var(--marinho);color:#fff;border-radius:18px;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);margin-top:8px}
+  .baixar .esq{padding:44px 44px 40px;display:flex;flex-direction:column;gap:18px}
+  .baixar h2{color:#fff}
+  .baixar .intro{color:#c7d2e0;margin:0}
+  .ficha-tec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 20px;font-size:14px;margin:6px 0 0;padding:16px 0 0;border-top:1px solid rgba(255,255,255,.14)}
+  .ficha-tec dt{color:#9fb0c4}
+  .ficha-tec dd{margin:0;font-family:var(--ff-m);font-size:13px;color:#fff;word-break:break-all}
+  .copiar{font:600 12px var(--ff-b);color:var(--ambar);background:none;border:0;padding:0 0 0 8px;cursor:pointer}
+  .baixar .dir{background:var(--marinho-2);padding:40px 44px;display:flex;flex-direction:column;gap:22px}
+  .qr-bloco{display:flex;gap:20px;align-items:center}
+  .qr-bloco .qr{background:#fff;border-radius:12px;padding:8px;flex-shrink:0}
+  .qr-bloco .qr img{width:132px;height:132px;display:block}
+  .qr-bloco p{margin:0;font-size:15px;color:#dbe4ee}
+  .qr-bloco p b{color:#fff}
+  .instalar{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:p}
+  .instalar li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;font-size:15px;color:#dbe4ee;counter-increment:p}
+  .instalar li::before{content:counter(p);display:grid;place-items:center;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);font-family:var(--ff-m);font-size:12.5px;color:#fff}
+  .instalar b{color:#fff}
+
+  /* ===== DÚVIDAS ===== */
+  .duvidas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px;margin-top:28px}
+  details{border-top:1px solid var(--cbd);padding-block:4px}
+  details:last-child,details:nth-last-child(2){border-bottom:1px solid var(--cbd)}
+  summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;padding:16px 0;font-family:var(--ff-h);font-weight:600;font-size:16.5px;color:var(--marinho)}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-family:var(--ff-m);color:var(--laranja);font-size:20px;line-height:1}
+  details[open] summary::after{content:"–"}
+  details p{margin:0 0 18px;color:var(--apagado);font-size:15.5px;max-width:60ch}
+
+  footer{background:var(--marinho);color:#9fb0c4;padding-block:32px;margin-top:80px;font-size:13.5px}
+  footer .wrap{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+  footer .marca{font-family:var(--ff-h);color:#fff;font-weight:700}
+  footer .links{margin-left:auto;display:flex;gap:20px} footer .links a{color:#9fb0c4}
+
+  @media (max-width:1000px){
+    nav .links{display:none}
+    .hero-grid{grid-template-columns:1fr;gap:8px;padding-top:36px}
+    .hero-txt{padding-bottom:28px}
+    .hero-txt h1{font-size:38px}
+    .hero-txt p.lede{font-size:17px}
+    .hero .fone{width:300px;justify-self:center}
+    .hero .fone .tela{aspect-ratio:412/420}
+    .demo{grid-template-columns:1fr;gap:32px}
+    .demo .fone{width:300px;order:-1}
+    .recursos{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .baixar{grid-template-columns:1fr}
+    .baixar .esq,.baixar .dir{padding:32px 24px}
+    .duvidas{grid-template-columns:1fr}
+    details:nth-last-child(2){border-bottom:0}
+    h2{font-size:27px}
+    section{padding-block:56px 16px}
+  }
+  @media (max-width:560px){
+    .wrap{padding-inline:16px}
+    nav .entrar{display:none}
+    .recursos{grid-template-columns:1fr}
+    .qr-bloco{flex-direction:column;align-items:flex-start}
+    .btn{width:100%;justify-content:center}
+    .btn-ghost{width:100%;justify-content:center}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img class="fundo" src="../hero_viaduto.webp" alt="">
+  <div class="veu"></div>
+  <div class="wrap">
+    <nav>
+      <a class="marca" href="../"><img src="../codice_horizontal_lockup.svg" alt="Códice — Engenharia de Custos"></a>
+      <div class="links"><a href="../../">Abrir buscador</a><a href="#demonstracao">Recursos</a><a href="../#bancos">Bancos</a><a class="ativo" href="./" aria-current="page">App Android</a><a href="../planos/">Planos</a></div>
+      <div class="acoes"><a class="entrar" href="../../entrar/">Entrar</a><a class="btn" href="#baixar">Baixar o app</a></div>
+    </nav>
+    <div class="hero-grid">
+      <div class="hero-txt">
+        <span class="selo"><i><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48l1.84-3.18a.4.4 0 00-.69-.4l-1.87 3.23a11.4 11.4 0 00-9.76 0L5.25 5.9a.4.4 0 00-.69.4L6.4 9.48A10.8 10.8 0 001 18h22a10.8 10.8 0 00-5.4-8.52zM7 15.25a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zm10 0a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5z"/></svg></i>App para Android · grátis para baixar</span>
+        <h1>A tabela oficial vai para a obra. <em>O critério vai junto.</em></h1>
+        <p class="lede">O Códice no seu celular: SINAPI, SICRO, SICOR, SUDECAP e mais nove bancos oficiais numa busca que entende classe e diâmetro, com preço onerado e desonerado, composição analítica aberta e o caderno técnico na página certa.</p>
+        <div class="cta">
+          <a class="btn" href="https://lucasfelipeoliver-create.github.io/acervo-bancos-referencia/app/codice.apk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Baixar para Android · 1,3 MB</a>
+          <a class="btn-ghost" href="#demonstracao">Ver funcionando</a>
+        </div>
+        <div class="prova"><span><b>67.113</b> códigos</span><span><b>13</b> bancos oficiais</span><span><b>387</b> documentos</span><span>funciona sem sinal depois da 1ª carga</span></div>
+      </div>
+      <div class="fone" aria-hidden="true"><div class="tela"><img src="codice-busca.webp" alt=""></div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="demonstracao">
+  <div class="wrap">
+    <p class="olho">Demonstração · busca real, preços da edição 2026-04</p>
+    <h2>Do “concreto fck 25” à composição aberta em quatro toques.</h2>
+    <p class="intro">Toque em cada passo para ver a tela do app. As telas são capturas do Códice publicado, não ilustração.</p>
+    <div class="demo">
+      <div>
+        <ol class="passos" id="passos"></ol>
+        <div class="demo-ctl"><button type="button" id="play" aria-pressed="true">Pausar</button><span id="pos" class="mono">1 / 5</span></div>
+      </div>
+      <div class="fone"><div class="tela" id="tela">
+        <img class="cam" id="im-busca" src="codice-busca.webp" alt="Tela de busca do app Códice com 191 resultados para concreto fck 25">
+        <img class="cam fora" id="im-ficha" src="codice-ficha.webp" alt="Ficha do código SICOR ED-48318 com preço onerado, desonerado e composição analítica">
+        <div class="foco" id="foco"></div>
+        <div class="toque" id="toque"></div>
+        <div class="legenda" id="legenda"></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section id="recursos">
+  <div class="wrap">
+    <p class="olho">Feito para o canteiro, não para a mesa</p>
+    <h2>O que muda quando o Códice está no bolso.</h2>
+    <div class="recursos">
+      <div class="rec">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8.8a15 15 0 0120 0M5 12.5a10 10 0 0114 0M8.5 16a5 5 0 017 0"/><path d="M3 3l18 18"/></svg>
+        <h3>Consulta sem sinal</h3>
+        <p>Depois da primeira carga, a busca e as fichas abrem no subsolo, na rodovia e na frente de serviço sem cobertura.</p>
+        <div class="dado">preços guardados no aparelho</div>
+      </div>
+      <div class="rec">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 11-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        <h3>Atualiza sozinho</h3>
+        <p>Saiu edição nova da fonte, o app já abre nela. Não precisa baixar de novo nem reinstalar.</p>
+        <div class="dado">data-base à vista em cada banco</div>
+      </div>
+      <div class="rec">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+        <h3>Código compartilhado com a origem</h3>
+        <p>Mande a ficha pelo WhatsApp: quem recebe abre o mesmo código, no mesmo banco, na mesma edição.</p>
+        <div class="dado">link direto para a ficha</div>
+      </div>
+      <div class="rec">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+        <h3>Letra do seu tamanho</h3>
+        <p>A+ e A− ajustam a leitura; o botão voltar do Android fecha ficha, gaveta e filtros na ordem certa.</p>
+        <div class="dado">tela cheia · barra inferior</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="baixar">
+  <div class="wrap">
+    <div class="baixar">
+      <div class="esq">
+        <p class="olho" style="color:var(--ambar);margin:0">Download direto</p>
+        <h2>Instale em um minuto.</h2>
+        <p class="intro">Arquivo assinado digitalmente, publicado no próprio site do Códice. Confira a impressão SHA-256 se quiser ter certeza de que é o mesmo arquivo.</p>
+        <div><a class="btn" href="https://lucasfelipeoliver-create.github.io/acervo-bancos-referencia/app/codice.apk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Baixar o app (APK · 1,3 MB)</a></div>
+        <dl class="ficha-tec">
+          <dt>Versão</dt><dd>1.0.0 · build 20/09/2026</dd>
+          <dt>Tamanho</dt><dd>1.401.002 bytes</dd>
+          <dt>Requer</dt><dd>Android 5.0 ou superior</dd>
+          <dt>SHA-256</dt><dd><span id="sha">26459a2d5d951dc028868a3cba7e2da3218b16bee6ac119566b71838716a4f92</span><button class="copiar" type="button" id="copiar">copiar</button></dd>
+        </dl>
+      </div>
+      <div class="dir">
+        <div class="qr-bloco">
+          <div class="qr"><img src="qr.svg" alt="QR code que abre a página de download do app Códice"></div>
+          <p><b>Está no computador?</b> Aponte a câmera do celular para o código e o download começa no aparelho.</p>
+        </div>
+        <ol class="instalar">
+          <li><span>Toque em <b>Baixar o app</b>. Se o Chrome perguntar, confirme o download.</span></li>
+          <li><span>Abra o arquivo baixado, pela barra de notificações ou pela pasta Downloads.</span></li>
+          <li><span>Se o Android pedir, permita <b>Instalar apps desconhecidos</b> para o Chrome, só desta vez.</span></li>
+          <li><span>Toque em <b>Instalar</b>. O ícone do Códice aparece na tela inicial.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="duvidas" style="padding-top:64px">
+  <div class="wrap">
+    <h2>Dúvidas antes de instalar</h2>
+    <div class="duvidas">
+      <details open><summary>Preciso pagar para usar?</summary><p>O download é grátis. A consulta segue o seu plano do Códice, com teste grátis de 3 meses para quem está começando.</p></details>
+      <details><summary>Por que o Android avisa sobre “app desconhecido”?</summary><p>O aviso aparece para todo app instalado fora da Play Store. O arquivo do Códice é assinado e o app só abre o endereço oficial do Códice, vinculado ao próprio site.</p></details>
+      <details><summary>Tenho iPhone. Consigo usar?</summary><p>Sim, pelo navegador. Abra o Códice no Safari, toque em Compartilhar e escolha “Adicionar à Tela de Início”.</p></details>
+      <details><summary>Os preços do app são os mesmos do site?</summary><p>São os mesmos: o app abre o Códice publicado, com as mesmas edições, UFs e regimes, e se atualiza junto com ele.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="marca">Códice</div>
+    <div>© Códice · operação comercial em implantação · Responsável técnico: Lucas Felipe de Oliveira, Eng. Civil, CREA 289.581</div>
+    <div class="links"><a href="../../privacidade/">Privacidade</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // posições em % da captura 824×1830 (= tela 412×915)
+  var PASSOS=[
+    {img:"busca",t:"Digite como você fala",d:"“concreto fck 25” devolve 191 candidatos dos 13 bancos, sem precisar saber o código.",f:[10.8,3.4,93.2,5.6],leg:"<b>191</b> resultados para “concreto fck 25”",ly:18.5},
+    {img:"busca",t:"A busca entende a classe",d:"O app lê “fck 25” como classe de resistência e mostra o que interpretou, antes de você rolar a lista.",f:[1.3,3.6,92.8,4.6],leg:"Interpretado: <b>classe = fck 25 MPa</b>",ly:8},
+    {img:"busca",t:"Compare preço nos dois regimes",d:"Cada linha traz banco, código, unidade e o valor onerado ao lado do desonerado.",f:[30.1,1.6,96.8,6.4],leg:"SICOR ED-48318 · <b>R$ 678,40</b> onerado · R$ 671,02 desonerado",ly:38.5,toque:[50,33]},
+    {img:"ficha",t:"Abra a composição analítica",d:"Um toque abre a ficha: preço da edição 2026-04 e os insumos com coeficiente, custo e peso de cada grupo.",f:[30.9,0,100,5.3],leg:"Material <b>80,2 %</b> · mão de obra 19,8 %",ly:38.5},
+    {img:"ficha",t:"Compare e compartilhe",d:"Coloque o código lado a lado com outros bancos ou mande a ficha para a equipe com a origem junto.",f:[92.4,2.5,95.5,6.6],leg:"<b>Comparar</b> · Composição · Ficha completa · Compartilhar",ly:80,toque:[84,95.6]}
+  ];
+  var DUR=5200, i=0, tocando=!matchMedia("(prefers-reduced-motion: reduce)").matches, timer=null;
+  var ol=document.getElementById("passos"), foco=document.getElementById("foco"), leg=document.getElementById("legenda"),
+      toque=document.getElementById("toque"), ib=document.getElementById("im-busca"), ifi=document.getElementById("im-ficha"),
+      play=document.getElementById("play"), pos=document.getElementById("pos");
+  ol.style.setProperty("--dur",DUR+"ms");
+  PASSOS.forEach(function(p,k){
+    var li=document.createElement("li"); li.className="passo";
+    li.innerHTML='<button type="button" id="passo-'+(k+1)+'"><span class="n">0'+(k+1)+'</span><span class="t">'+p.t+'</span><span class="d">'+p.d+'</span><span class="barra"></span></button>';
+    li.firstChild.addEventListener("click",function(){ir(k,true)});
+    ol.appendChild(li);
+  });
+  function ir(k,manual){
+    i=k; var p=PASSOS[k];
+    ib.classList.toggle("fora",p.img!=="busca"); ifi.classList.toggle("fora",p.img!=="ficha");
+    foco.style.top=p.f[0]+"%"; foco.style.left=p.f[1]+"%"; foco.style.width=p.f[2]+"%"; foco.style.height=p.f[3]+"%";
+    leg.innerHTML=p.leg; leg.style.top=p.ly+"%";
+    if(p.toque){toque.style.left=p.toque[0]+"%";toque.style.top=p.toque[1]+"%";toque.classList.remove("bate");void toque.offsetWidth;toque.classList.add("bate")}
+    [].forEach.call(ol.children,function(li,j){
+      li.classList.toggle("ativo",j===k);
+      var b=li.querySelector(".barra"); b.classList.remove("corre"); void b.offsetWidth; if(j===k&&tocando) b.classList.add("corre");
+    });
+    pos.textContent=(k+1)+" / "+PASSOS.length;
+    if(manual) pausar();
+    agenda();
+  }
+  function agenda(){ clearTimeout(timer); if(tocando) timer=setTimeout(function(){ir((i+1)%PASSOS.length,false)},DUR); }
+  function pausar(){ tocando=false; clearTimeout(timer); play.textContent="Reproduzir"; play.setAttribute("aria-pressed","false");
+    var b=ol.querySelector(".passo.ativo .barra"); if(b) b.classList.remove("corre"); }
+  play.addEventListener("click",function(){
+    if(tocando){pausar();} else {tocando=true; play.textContent="Pausar"; play.setAttribute("aria-pressed","true"); ir((i+1)%PASSOS.length,false);}
+  });
+  if(!tocando){play.textContent="Reproduzir";play.setAttribute("aria-pressed","false");}
+  ir(0,false);
+
+  document.getElementById("copiar").addEventListener("click",function(ev){
+    var t=document.getElementById("sha").textContent, b=ev.currentTarget;
+    function ok(){b.textContent="copiado";setTimeout(function(){b.textContent="copiar"},1600)}
+    function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById("sha"));var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="selecionado"}
+    try{navigator.clipboard.writeText(t).then(ok,sel)}catch(e){sel()}
+  });
+})();
+</script>
+</body>
+</html>
