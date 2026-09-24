@@ -75,7 +75,22 @@
   footer .marca{font-family:"Montserrat","Segoe UI",sans-serif;color:#fff;font-weight:700}
   footer .links{margin-left:auto;display:flex;gap:20px} footer .links a{color:#9fb0c4} footer .links a:hover{color:#fff}
   .sep{border-top:1px solid var(--fio);margin:24px 0 0}
+  /* FAIXA DO APP ANDROID (24/09/2026, pedido dele: "crie um link para acesso dessa aba na vitrine") — o link do menu
+     some abaixo de 900 px (nav .links), então o acesso à aba /vitrine/app/ precisa de um bloco visível em qualquer
+     largura. Mesmos tokens e moldura de celular da aba do app. */
+  .app-faixa{background:var(--marinho);color:#fff;border-radius:16px;display:grid;grid-template-columns:minmax(0,1fr) 236px;gap:40px;align-items:end;padding:36px 44px 0;overflow:hidden}
+  .app-faixa .txt{display:flex;flex-direction:column;gap:14px;padding-bottom:36px}
+  .app-faixa .olho{font-family:"IBM Plex Mono",Consolas,monospace;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ambar)}
+  .app-faixa h3{color:#fff;font-size:28px;margin:0}
+  .app-faixa p{margin:0;color:#dbe4ee;max-width:58ch}
+  .app-faixa .acoes-app{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:4px}
+  .app-faixa .acoes-app small{color:#9fb0c4;font-size:13.5px}
+  .app-faixa .fone{background:#0a1626;border-radius:30px 30px 0 0;padding:9px 9px 0;box-shadow:0 20px 40px rgba(2,10,22,.45),inset 0 0 0 1.5px #2b3d55}
+  .app-faixa .fone img{display:block;width:100%;aspect-ratio:412/560;object-fit:cover;object-position:top;border-radius:22px 22px 0 0}
   @media (max-width:900px){
+    .app-faixa{grid-template-columns:1fr;gap:24px;padding:28px 22px 0}
+    .app-faixa .txt{padding-bottom:0}
+    .app-faixa .fone{width:220px;justify-self:center}
     nav .links{display:none}
     .hero-txt h1{font-size:36px} .hero-txt p{font-size:17px}
     .cr{grid-template-columns:minmax(0,1fr) 72px 72px;font-size:14px;padding:12px 14px}
@@ -382,6 +397,20 @@
   </div>
 </section>
 
+<section id="app" style="padding-top:48px">
+  <div class="wrap">
+    <div class="app-faixa">
+      <div class="txt">
+        <span class="olho">App para Android · grátis para baixar</span>
+        <h3>O Códice no bolso da obra.</h3>
+        <p>Os 13 bancos oficiais no celular: busca que entende classe e diâmetro, filtros montados para cada resultado, preço onerado e desonerado e composição analítica aberta. Funciona sem sinal depois da primeira carga.</p>
+        <div class="acoes-app"><a class="btn" href="app/">Conhecer e baixar o app</a><small>Veja a demonstração com as telas reais</small></div>
+      </div>
+      <div class="fone"><img src="app/codice-busca.webp" alt="Tela de busca do app Códice com 191 resultados para concreto fck 25" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
 <section id="planos" style="padding-top:20px">
   <div class="wrap">
     <div class="sep"></div>
@@ -398,7 +427,7 @@
   <div class="wrap">
     <div class="marca">Códice</div>
     <div>© Códice · operação comercial em implantação · Responsável técnico: Lucas Felipe de Oliveira, Eng. Civil, CREA 289.581</div>
-    <div class="links"><a href="/privacidade/">Privacidade</a><a href="mailto:lucasfelipeoliver.eng@gmail.com">Contato</a></div>
+    <div class="links"><a href="app/">App Android</a><a href="/privacidade/">Privacidade</a><a href="mailto:lucasfelipeoliver.eng@gmail.com">Contato</a></div>
   </div>
 <div class="aviso-legal-rodape" style="font-size:11px;color:inherit;opacity:0.75;line-height:1.5;margin-top:16px;text-align:center;max-width:920px;margin-left:auto;margin-right:auto;">
   <b>Aviso legal e de conformidade:</b> O Códice é uma plataforma de tecnologia privada e independente. Os bancos referenciais e cadernos técnicos (SINAPI, SICRO, SICOR, SUDECAP, DER, GOINFRA, SEDOP, SIURB, AGESUL, SANEPAR) são dados públicos oficiais regidos pela Lei de Acesso à Informação (Lei nº 12.527/2011). O Códice não possui vínculo, representação, chancela ou afiliação institucional com os órgãos públicos gestores citados. As insígnias e ícones exibidos têm finalidade exclusivamente indicativa e referencial.
