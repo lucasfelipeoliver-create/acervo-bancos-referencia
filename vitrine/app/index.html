@@ -208,15 +208,16 @@
 <section id="demonstracao">
   <div class="wrap">
     <p class="olho">Demonstração · busca real, preços da edição 2026-04</p>
-    <h2>Do “concreto fck 25” à composição aberta em quatro toques.</h2>
+    <h2>Do “concreto fck 25” à composição aberta, sem sair do celular.</h2>
     <p class="intro">Toque em cada passo para ver a tela do app. As telas são capturas do Códice publicado, não ilustração.</p>
     <div class="demo">
       <div>
         <ol class="passos" id="passos"></ol>
-        <div class="demo-ctl"><button type="button" id="play" aria-pressed="true">Pausar</button><span id="pos" class="mono">1 / 5</span></div>
+        <div class="demo-ctl"><button type="button" id="play" aria-pressed="true">Pausar</button><span id="pos" class="mono">1 / 6</span></div>
       </div>
       <div class="fone"><div class="tela" id="tela">
         <img class="cam" id="im-busca" src="codice-busca.webp" alt="Tela de busca do app Códice com 191 resultados para concreto fck 25">
+        <img class="cam fora" id="im-filtro" src="codice-filtro.webp" alt="Filtro Objeto aberto na busca concreto fck 25: 191 códigos e 42 valores, cada um com a sua contagem">
         <img class="cam fora" id="im-ficha" src="codice-ficha.webp" alt="Ficha do código SICOR ED-48318 com preço onerado, desonerado e composição analítica">
         <div class="foco" id="foco"></div>
         <div class="toque" id="toque"></div>
@@ -317,6 +318,7 @@
   var PASSOS=[
     {img:"busca",t:"Digite como você fala",d:"“concreto fck 25” devolve 191 candidatos dos 13 bancos, sem precisar saber o código.",f:[10.8,3.4,93.2,5.6],leg:"<b>191</b> resultados para “concreto fck 25”",ly:18.5},
     {img:"busca",t:"A busca entende a classe",d:"O app lê “fck 25” como classe de resistência e mostra o que interpretou, antes de você rolar a lista.",f:[1.3,3.6,92.8,4.6],leg:"Interpretado: <b>classe = fck 25 MPa</b>",ly:8},
+    {img:"filtro",t:"Filtre pelo que a busca encontrou",d:"Os filtros mudam a cada busca: para “concreto fck 25” o app monta Objeto, Variante e Origem do agregado só com o que existe nos 191 resultados, com a contagem de cada valor.",f:[23.9,3.0,94.2,30.6],leg:"Objeto: <b>42 valores</b> nos 191 resultados · Concreto 47 · Estaca escavada 20",ly:57,toque:[14.3,26.7]},
     {img:"busca",t:"Compare preço nos dois regimes",d:"Cada linha traz banco, código, unidade e o valor onerado ao lado do desonerado.",f:[30.1,1.6,96.8,6.4],leg:"SICOR ED-48318 · <b>R$ 678,40</b> onerado · R$ 671,02 desonerado",ly:38.5,toque:[50,33]},
     {img:"ficha",t:"Abra a composição analítica",d:"Um toque abre a ficha: preço da edição 2026-04 e os insumos com coeficiente, custo e peso de cada grupo.",f:[30.9,0,100,5.3],leg:"Material <b>80,2 %</b> · mão de obra 19,8 %",ly:38.5},
     {img:"ficha",t:"Compare e compartilhe",d:"Coloque o código lado a lado com outros bancos ou mande a ficha para a equipe com a origem junto.",f:[92.4,2.5,95.5,6.6],leg:"<b>Comparar</b> · Composição · Ficha completa · Compartilhar",ly:80,toque:[84,95.6]}
@@ -324,6 +326,7 @@
   var DUR=5200, i=0, tocando=!matchMedia("(prefers-reduced-motion: reduce)").matches, timer=null;
   var ol=document.getElementById("passos"), foco=document.getElementById("foco"), leg=document.getElementById("legenda"),
       toque=document.getElementById("toque"), ib=document.getElementById("im-busca"), ifi=document.getElementById("im-ficha"),
+      ifl=document.getElementById("im-filtro"),
       play=document.getElementById("play"), pos=document.getElementById("pos");
   ol.style.setProperty("--dur",DUR+"ms");
   PASSOS.forEach(function(p,k){
@@ -334,7 +337,7 @@
   });
   function ir(k,manual){
     i=k; var p=PASSOS[k];
-    ib.classList.toggle("fora",p.img!=="busca"); ifi.classList.toggle("fora",p.img!=="ficha");
+    ib.classList.toggle("fora",p.img!=="busca"); ifi.classList.toggle("fora",p.img!=="ficha"); ifl.classList.toggle("fora",p.img!=="filtro");
     foco.style.top=p.f[0]+"%"; foco.style.left=p.f[1]+"%"; foco.style.width=p.f[2]+"%"; foco.style.height=p.f[3]+"%";
     leg.innerHTML=p.leg; leg.style.top=p.ly+"%";
     if(p.toque){toque.style.left=p.toque[0]+"%";toque.style.top=p.toque[1]+"%";toque.classList.remove("bate");void toque.offsetWidth;toque.classList.add("bate")}
