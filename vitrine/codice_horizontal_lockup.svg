@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 280" width="100%" height="100%">
+  <!-- Símbolo à Esquerda (escala 0.63: em 0.68 a base do bloco laranja passava de y=280 do viewBox, cortando ~17u) -->
+  <g transform="translate(15, 5) scale(0.63)">
+    <!-- Bloco Inferior Laranja -->
+    <g transform="translate(0, 150)">
+      <polygon points="70,140 250,230 250,280 70,190" fill="#9a3412" />
+      <polygon points="250,230 430,140 430,190 250,280" fill="#ea580c" />
+      <polygon points="70,140 250,50 430,140 250,230" fill="#f97316" stroke="#fed7aa" stroke-width="2" stroke-linejoin="round" />
+      <polygon points="120,140 250,75 380,140 250,205" fill="#c2410c" stroke="#ffedd5" stroke-width="1.5" />
+      <line x1="70" y1="140" x2="120" y2="140" stroke="#ffedd5" stroke-width="2" />
+      <line x1="430" y1="140" x2="380" y2="140" stroke="#ffedd5" stroke-width="2" />
+      <line x1="250" y1="50" x2="250" y2="75" stroke="#ffedd5" stroke-width="2" />
+      <line x1="250" y1="230" x2="250" y2="205" stroke="#ffedd5" stroke-width="2" />
+    </g>
+
+    <!-- Bloco Intermediário Ciano -->
+    <g transform="translate(0, 75)">
+      <polygon points="70,140 250,230 250,280 70,190" fill="#0369a1" />
+      <polygon points="250,230 430,140 430,190 250,280" fill="#0ea5e9" />
+      <polygon points="70,140 250,50 430,140 250,230" fill="#38bdf8" stroke="#bae6fd" stroke-width="2" stroke-linejoin="round" />
+      <polygon points="120,140 250,75 380,140 250,205" fill="#0284c7" stroke="#e0f2fe" stroke-width="1.5" />
+      <line x1="70" y1="140" x2="120" y2="140" stroke="#ffffff" stroke-width="2" />
+      <line x1="430" y1="140" x2="380" y2="140" stroke="#ffffff" stroke-width="2" />
+      <line x1="250" y1="50" x2="250" y2="75" stroke="#ffffff" stroke-width="2" />
+      <line x1="250" y1="230" x2="250" y2="205" stroke="#ffffff" stroke-width="2" />
+    </g>
+
+    <!-- Bloco Superior Marinho -->
+    <g transform="translate(0, 0)">
+      <polygon points="70,140 250,230 250,280 70,190" fill="#112338" />
+      <polygon points="250,230 430,140 430,190 250,280" fill="#1e3a5f" />
+      <polygon points="70,140 250,50 430,140 250,230" fill="#244569" stroke="#93c5fd" stroke-width="2" stroke-linejoin="round" />
+      <polygon points="120,140 250,75 380,140 250,205" fill="#14263b" stroke="#60a5fa" stroke-width="1.5" />
+      <line x1="70" y1="140" x2="120" y2="140" stroke="#bfdbfe" stroke-width="2" />
+      <line x1="430" y1="140" x2="380" y2="140" stroke="#bfdbfe" stroke-width="2" />
+      <line x1="250" y1="50" x2="250" y2="75" stroke="#bfdbfe" stroke-width="2" />
+      <line x1="250" y1="230" x2="250" y2="205" stroke="#bfdbfe" stroke-width="2" />
+    </g>
+  </g>
+
+  <!-- Tipografia Alinhada -->
+  <text x="365" y="160" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="130" font-weight="700" fill="#ffffff" letter-spacing="4">CÓDICE</text>
+  <text x="372" y="235" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="34" font-weight="600" fill="#38bdf8" letter-spacing="11">ENGENHARIA DE CUSTOS</text>
+</svg>
